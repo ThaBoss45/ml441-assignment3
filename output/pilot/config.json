@@ -1,0 +1,26 @@
+{
+  "dataset": "co2",
+  "fold": {
+    "number": 1,
+    "fit_end": 367,
+    "stop_end": 407,
+    "valid_end": 488
+  },
+  "history": 24,
+  "hidden": {
+    "elman": 8,
+    "jordan": 24,
+    "multi": 8
+  },
+  "learning_rate": 0.001,
+  "seeds": [
+    11,
+    23
+  ],
+  "max_epochs": 400,
+  "patience": 20,
+  "batch_size": 256,
+  "weight_decay": 0.0001,
+  "output_directory": "output/pilot",
+  "difference_lag": 1
+}

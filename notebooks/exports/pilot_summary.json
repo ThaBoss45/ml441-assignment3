@@ -1,0 +1,54 @@
+{
+  "development_end": 650,
+  "validation_block": 81,
+  "naive": {
+    "mae": 1.1355555555555543,
+    "rmse": 1.2784780689708772,
+    "mase": 1.092856516784994
+  },
+  "deterministic_repeat": true,
+  "runs": [
+    {
+      "architecture": "elman",
+      "seed": 11,
+      "mae": 0.3492640710318522,
+      "best_epoch": 400,
+      "runtime_seconds": 2.095486458041705
+    },
+    {
+      "architecture": "elman",
+      "seed": 23,
+      "mae": 0.3497561547895969,
+      "best_epoch": 400,
+      "runtime_seconds": 2.3155123749747872
+    },
+    {
+      "architecture": "jordan",
+      "seed": 11,
+      "mae": 0.6174229380157253,
+      "best_epoch": 400,
+      "runtime_seconds": 2.7760876669781283
+    },
+    {
+      "architecture": "jordan",
+      "seed": 23,
+      "mae": 0.6196133104150673,
+      "best_epoch": 400,
+      "runtime_seconds": 2.583731292048469
+    },
+    {
+      "architecture": "multi",
+      "seed": 11,
+      "mae": 0.3033261008137538,
+      "best_epoch": 370,
+      "runtime_seconds": 2.927820625016466
+    },
+    {
+      "architecture": "multi",
+      "seed": 23,
+      "mae": 0.2972996844516841,
+      "best_epoch": 400,
+      "runtime_seconds": 2.997262957971543
+    }
+  ]
+}
