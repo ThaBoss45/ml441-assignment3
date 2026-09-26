@@ -1,0 +1,159 @@
+\documentclass[conference,10pt]{IEEEtran}
+\usepackage{amsmath,amssymb,booktabs,graphicx,array,url}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\graphicspath{{generated/}}
+\setlength{\emergencystretch}{2em}
+\raggedbottom
+
+\begin{document}
+\title{Elman, Jordan, and Combined-Feedback Recurrent Networks for One-Step Time-Series Forecasting}
+\author{\IEEEauthorblockN{D. Moolman}
+\IEEEauthorblockA{Student number: 27187314\\
+Machine Learning 441, Stellenbosch University\\
+27187314@sun.ac.za}}
+\maketitle
+
+\begin{abstract}
+\input{generated/abstract}
+\end{abstract}
+
+\begin{IEEEkeywords}
+forecast evaluation, recurrent neural networks, temporal validation, time series
+\end{IEEEkeywords}
+
+\section{Introduction}
+An ordered observation carries information about earlier observations and, sometimes, about a changing generating process. A recurrent neural network uses feedback to represent preceding network activity. The source and destination of feedback distinguish the simple recurrent architectures considered here. An Elman network feeds hidden activity back to the hidden layer. A Jordan network feeds output activity back to the hidden layer. A multi-recurrent network combines both paths \cite{engelbrecht2007computational,abdulkarim2019recurrent}. The study compared these three architectures for univariate one-step-ahead forecasting.
+
+The comparison used five series from atmospheric science, solar observation, household electricity, retail activity, and precipitation. The series differ in trend, periodicity, noise, and source missingness. A forecast origin was the last observed period available when a forecast was issued. The horizon was exactly one subsequent sampling period for every architecture on a given series. Three expanding chronological validation blocks selected controls within the earlier development period. A later period supplied one final evaluation. Persistence and applicable seasonal-naive forecasts supplied diagnostic references. Such explicit origin and updating choices are central to interpretable out-of-sample forecasting evidence \cite{tashman2000outofsample,hewamalage2023evaluation}.
+
+The study asked which feedback architecture achieved the lowest mean absolute error on each final period, whether differences persisted across initialisation seeds, and whether the neural forecasts improved on simple baselines. Capacity was made visible through exact trainable-parameter counts. The report first defines the forecast and architectures, then describes the datasets and implementation. The empirical process establishes the selection and evaluation boundaries before the results are discussed.
+
+\section{Background}
+The background defines the forecast task, the three feedback paths, and the measures used to interpret chronological forecasts. Those definitions establish the terms used in the dataset and empirical sections.
+
+\subsection{Forecasts and Temporal Structure}
+Let $y_t$ denote the observed scalar target at period $t$. A one-step forecast $\hat y_{t+1\mid t}$ estimates the next target using information observed no later than $t$. A rolling origin advances $t$ after an observation arrives. Consequently, an earlier validation or test observation can be a legitimate input to a later one-step forecast, although that observation cannot alter a model fitted at an earlier origin. A fixed-origin multi-step forecast would answer a different operational question \cite{tashman2000outofsample}.
+
+Weak stationarity requires a constant mean and variance and an autocovariance determined by lag rather than calendar time. A visible trend or changing seasonal pattern challenges that definition. The augmented Dickey--Fuller (ADF) test has a unit-root null hypothesis; the Kwiatkowski--Phillips--Schmidt--Shin (KPSS) test has a level-stationarity null under the form used here \cite{dickey1979unitroot,kwiatkowski1992stationarity}. Failure to reject either null does not prove the null. Plots, rolling summaries, and both tests therefore inform a qualified assessment. Tests on a historically revised snapshot do not establish stationarity for every future regime.
+
+\subsection{Feedback Architectures}
+A simple recurrent neural network (SRNN) has a feedback path that carries activity from one computation step to the next. Engelbrecht described the Elman context as a copy of the preceding hidden layer and the Jordan state as a copy of the preceding output layer \cite{engelbrecht2007computational}. Abdulkarim and Engelbrecht defined the multi-recurrent network as the combination of those two paths \cite{abdulkarim2019recurrent}. A generic software recurrent cell does not specify the Jordan output-feedback path.
+
+For the implemented scalar-input networks, $z_t$ denotes the transformed, scaled observation at step $t$. The vector $\mathbf h_t\in\mathbb R^H$ contains $H$ hidden activations. The scalar $\hat z_{t+1}$ denotes the predicted transformed target. Matrices $\mathbf W_x$, $\mathbf W_h$, and $\mathbf W_o$ map the observed input, preceding hidden state, and preceding predicted output into the hidden layer respectively. The row vector $\mathbf W_y$ maps the hidden layer to the output. The hidden bias $\mathbf b_h$ and output bias $b_y$ are trainable. With hyperbolic-tangent hidden activation and linear output activation, the three recurrences are
+\begin{align}
+\text{Elman:}\quad \mathbf h_t & = \tanh(\mathbf W_x z_t+\mathbf W_h\mathbf h_{t-1}+\mathbf b_h),\\
+\text{Jordan:}\quad \mathbf h_t & = \tanh(\mathbf W_x z_t+\mathbf W_o\hat z_t+\mathbf b_h),\\
+\text{Combined:}\quad \mathbf h_t & = \tanh(\mathbf W_x z_t+\mathbf W_h\mathbf h_{t-1}
+ +\mathbf W_o\hat z_t+\mathbf b_h),\\
+\hat z_{t+1} & = \mathbf W_y\mathbf h_t+b_y.
+\end{align}
+The first input step of each history window uses $\mathbf h_{t-1}=\mathbf 0$ and $\hat z_t=0$. Later Jordan feedback uses the preceding \emph{predicted} output during both fitting and inference. The corresponding observed target is never inserted as teacher-forced feedback. Each history window resets the two states; overlap between windows changes the observed input history, not the initial-state convention.
+
+The input, hidden, feedback, output, and bias terms determine the parameter counts. Elman has $H^2+3H+1$, Jordan has $4H+1$, and the combined network has $H^2+4H+1$ trainable parameters. The hidden-state copy and output-state copy have fixed unit copy weights. The feedback-to-hidden matrices are trainable. Equal hidden width therefore does not imply equal capacity. The study used approximately matched parameter budgets and reported the remaining differences.
+
+Table~\ref{tab:architectures} summarises the feedback paths and the exact counts at the two capacity settings. The combined network adds a learned output path to Elman feedback. Jordan uses a wider hidden layer under a similar parameter budget because Jordan feedback has no hidden-to-hidden weight matrix.
+
+\input{generated/architecture_table}
+
+\subsection{Accuracy Measures and Baselines}
+For $m$ scored origins, let $e_i=y_i-\hat y_i$ denote level-unit error. Mean absolute error (MAE) and root mean squared error (RMSE) are defined by
+\begin{equation}
+\mathrm{MAE}=\frac{1}{m}\sum_{i=1}^{m}|e_i|,\qquad
+\mathrm{RMSE}=\sqrt{\frac{1}{m}\sum_{i=1}^{m}e_i^2}.
+\end{equation}
+RMSE gives large errors greater influence. Mean absolute scaled error (MASE) divides MAE by the mean absolute first difference of \emph{observed training levels}. The denominator is calculated anew from the current fitting prefix or final development period. MASE permits scale-independent cross-series interpretation while retaining dependence on its reference scale \cite{hyndman2006accuracy}. Mean absolute percentage error was excluded because sunspot counts include zero and low values would make percentage errors unstable.
+
+Persistence predicts $y_t$ for $y_{t+1}$. A seasonal-naive forecast predicts the observation one established seasonal period earlier. The seasonal lags were twelve months for carbon dioxide, retail, and precipitation, and seven days for household power. The variable solar cycle was not represented as a fixed seasonal-naive lag. Baselines diagnose whether a recurrent network adds practical predictive value; the required primary comparison remains among the three SRNNs.
+
+\section{Datasets and Preprocessing}
+The dataset account identifies the original target, the observed data defects, and the transformation shared by the three networks. Source files were retained unchanged with recorded SHA-256 hashes. The analysis used the latest acquired snapshot through December 2025, except for the household series ending in November 2010. Source revisions therefore remain an interpretation limit.
+
+The United States National Oceanic and Atmospheric Administration (NOAA) supplied the Mauna Loa monthly mean carbon-dioxide series\footnote{Dataset URL: \url{https://gml.noaa.gov/ccgg/trends/data.html}.}. The World Data Center for the Sunspot Index and Long-term Solar Observations (WDC-SILSO), Royal Observatory of Belgium, Brussels, supplied the monthly sunspot number\footnote{Dataset URL: \url{https://www.sidc.be/SILSO/datafiles}; version 2.0, DOI: 10.24414/qnza-ac80.}. The University of California Irvine archive supplied household electricity measurements\footnote{Dataset URL: \url{https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption}.}. The Office for National Statistics supplied unadjusted retail-volume index J448\footnote{Dataset URL: \url{https://www.ons.gov.uk/businessindustryandtrade/retailindustry/timeseries/j448/drsi}.}. The Met Office supplied the England and Wales precipitation series\footnote{Dataset URL: \url{https://www.metoffice.gov.uk/hadobs/hadukp/data/download.html}.}. Published accounts support the long observational rainfall series and the recurrent comparison context \cite{alexander2001precipitation,abdulkarim2019recurrent}.
+
+Figure~\ref{fig:series} displays the five original target levels and marks their final-test boundaries. The panels provide visual context for the development-only stationarity checks and the later error comparisons.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{series.pdf}
+\caption{Five observed target levels. The dashed line in each panel marks its final-test boundary. Panels retain their original units and separate vertical scales.}
+\label{fig:series}
+\end{figure*}
+
+The panels show a rising carbon-dioxide level, changing sunspot-cycle amplitude, variable daily power, changing retail volume, and highly variable rainfall. The figure supports the planned diversity of series. It does not, by itself, establish stationarity or identify the cause of a subsequent forecast error.
+
+Table~\ref{tab:data} reports the modelled lengths and development-only diagnostic results. The ADF and KPSS probabilities were interpreted alongside the observed temporal patterns. The household daily target was the arithmetic mean of valid minute-level active-power measurements, expressed in kilowatts. A day required at least 1,368 valid minutes, or 95\% of the expected 1,440. Incomplete endpoints were excluded. Twenty-three interior days failed the threshold. A missing day was neither fitted nor scored. Model inputs for such days used only the latest \emph{earlier} observed daily value. The rule preserves the daily grid, but it can obscure a change during an outage.
+
+\input{generated/data_table}
+
+The carbon-dioxide level rose in the development period. A first difference, $y_t-y_{t-1}$, supplied the network target; the preceding observed level reconstructed the forecast. The source's six post-1974 interpolated months remained in the acquired series and were disclosed rather than silently replaced. The NOAA source also combined early Scripps measurements with later NOAA measurements and substituted a nearby site during the 2022--2023 Mauna Loa interruption. Those source changes limit physical interpretation of forecast errors. The retail level combined long-run rise and annual seasonality. A twelve-month difference, $y_t-y_{t-12}$, removed much of the repeated calendar pattern; the observed level from twelve months earlier reconstructed the forecast. The transformed retail stationarity tests did not agree, so no claim of established stationarity follows. Sunspot, power, and precipitation levels were retained. Source values at zero were valid observations, not missing markers.
+
+For each fold, scaling parameters came only from its fitting prefix. The chronological early-stopping and validation segments used the same fixed scaler. The final refit used a new scaler fitted on the complete development period. Difference lags were fixed before primary fitting. Every reported error was calculated after inverse scaling and, where needed, inverse differencing. No full-series scaler, future-assisted interpolation, or test-fitted decomposition was used.
+
+\section{Implementation}
+The implementation account distinguishes the mathematical recurrences from the software used to calculate gradients and manage experiments. Three separate PyTorch modules implement the equations above with explicit linear maps. No built-in recurrent cell supplies the hidden or output feedback. Matrix shapes, parameter counts, initial states, and state updates were checked against hand-computed examples. A single scalar enters each step, and only the final step of a history window contributes a one-step training loss. Observed windows can overlap, but no recurrent state carries between windows.
+
+Training minimised mean squared error on the scaled target with Adam \cite{kingma2015adam}. Gradients were clipped at Euclidean norm one. Hidden weights, output weights, and biases were all trainable; weight decay was fixed at $10^{-4}$. Fixed chronological batches contained at most 256 windows. The three prescribed seeds controlled initial weights and were identical for all architectures. Deterministic central processing unit (CPU) operations were requested, and a repeated pilot run produced identical predictions in the tested environment. Exact software versions, raw hashes, configurations, fold outputs, and seed-level predictions were saved alongside the analysis.
+
+\section{Empirical Process}
+The empirical process establishes the chronological boundaries, tuning grid, stopping criterion, and final decision rule. The pilot was a development-only pipeline check and did not contribute to the final comparison. The frozen protocol preceded the primary experiment.
+
+\subsection{Chronological Boundaries}
+For a modelled series of length $N$, the development endpoint was $D=\lfloor0.8N\rfloor$. The final test consisted of positions $[D,N)$. A validation block contained $V=\lfloor0.1N\rfloor$ target positions. The three expanding validation intervals were $[D-3V,D-2V)$, $[D-2V,D-V)$, and $[D-V,D)$. The corresponding training intervals began at the first modelled observation and ended before each validation block. The final 10\% of each training interval was reserved as a chronological early-stopping tail. The preceding observations fitted network weights and scaler parameters. Table~\ref{tab:splits} gives the resulting calendar boundaries. Validation target blocks and the final test were disjoint. Their history windows legitimately shared earlier observed inputs.
+
+\input{generated/split_table}
+
+At each validation or test origin, a model received the latest declared history of observed transformed targets. The history comprised 24 months for carbon dioxide, retail, and precipitation, 60 months for sunspots, and 28 days for power. A target already observed at an earlier origin could enter a later history window. No validation or test target controlled a scaler, preceding forecast, checkpoint, hyperparameter, or final refit epoch before the permitted selection stage. Missing power targets were excluded using one common target mask for all methods.
+
+\subsection{Control Selection and Stopping}
+Each architecture searched two approximate capacity budgets and learning rates 0.003 and 0.01. Elman and combined networks used $H\in\{8,18\}$; Jordan used $H\in\{24,96\}$. The parameter budgets were approximately 100 and 400, as calculated from the equations. The same three validation blocks and seeds 11, 23, and 37 were used for every candidate. The search therefore contained four candidate configurations and nine fold-seed evaluations per candidate for each architecture and dataset. The selected configuration had the lowest mean validation MAE. Exact numerical ties favoured fewer trainable parameters and then the lower learning rate. The finite grid supports a best-within-grid conclusion only.
+
+Early stopping selected the checkpoint with the lowest MAE on the chronological tail of the current fold-training interval. Patience was 20 epochs, with a 400-epoch maximum. Training and tail histories were retained to distinguish early stopping from cap-limited training. Once a configuration was selected, its nine best epochs supplied a rounded median fixed epoch count. The model was then refitted on all development observations for each seed. All fifteen architecture-dataset choices were saved before any final-test score was calculated.
+
+\subsection{Evaluation and Evidence Roles}
+Primary evaluation compared seed-level MAE on identical final targets. RMSE and MASE assessed large errors and cross-series scaling. Persistence and seasonal-naive forecasts used the same target positions. Fold-level validation records described selection and its sensitivity to origin. Final seed spread described optimisation variation; seed runs did not create independent test periods. A lowest mean test MAE identified the observed winner, while the baseline comparison and paired origin errors bounded practical interpretation. No final-test error changed a configuration.
+
+The pilot verified source loading, split indices, training-only scaling, causal missing inputs, inverse differencing, recurrent-state arithmetic, checkpoint restoration, metrics, saved settings, and a deterministic rerun. Its files were isolated under \texttt{output/pilot}. The primary selection and final evaluation were stored under \texttt{output/primary}; development-only diagnostics were stored under \texttt{output/diagnostics}. Table~\ref{tab:experiments} defines the role and limitation of each experiment before the corresponding results are presented.
+
+\input{generated/experiment_table}
+
+\section{Results and Discussion}
+The results first examine the selected controls, then compare final errors and baselines across the five datasets. The final paragraphs connect observed patterns to data behaviour and identify limits of the comparison.
+\input{generated/results}
+
+\clearpage
+
+\section{Conclusions}
+\input{generated/conclusion}
+
+\appendices
+\section{Acronyms}
+\begin{tabular}{ll}
+ADF & augmented Dickey--Fuller\\
+KPSS & Kwiatkowski--Phillips--Schmidt--Shin\\
+MAE & mean absolute error\\
+MASE & mean absolute scaled error\\
+RMSE & root mean squared error\\
+SRNN & simple recurrent neural network
+\end{tabular}
+
+\section{Mathematical Symbols}
+\begin{tabular}{ll}
+$D$ & development endpoint\\
+$e_i$ & level-unit forecast error\\
+$H$ & hidden-layer width\\
+$m$ & number of scored origins\\
+$N$ & modelled series length\\
+$t$ & time index\\
+$V$ & validation-block length\\
+$y_t$ & observed target\\
+$z_t$ & transformed, scaled observation\\
+$\mathbf h_t$ & hidden state\\
+$\mathbf W_x,\mathbf W_h,\mathbf W_o,\mathbf W_y$ & trainable weight matrices\\
+$\mathbf b_h,b_y$ & trainable biases
+\end{tabular}
+
+\bibliographystyle{IEEEtranS}
+\bibliography{../citations/references}
+\end{document}

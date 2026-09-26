@@ -1,0 +1,1391 @@
+{
+  "role": "supplementary post-hoc diagnostic of saved development curves",
+  "purpose": "Check whether training loss continued to fall after the tail-selected checkpoint",
+  "partition": "development fitting and chronological early-stopping tails only",
+  "fixed": "frozen selected configurations and saved curve records",
+  "varied": "epoch, fold, seed, architecture and dataset as already recorded",
+  "model_selection_effect": "none",
+  "limitation": "The best tail MAE is selected by construction; training scaled MSE and tail original-unit MAE are different metrics on different periods. This diagnostic does not prove overfitting.",
+  "selected_development_fits": 135,
+  "training_loss_lower_after_selected_checkpoint": 131,
+  "all_tail_mae_increases_by_construction": true,
+  "per_dataset": {
+    "co2": {
+      "fits": 27,
+      "training_loss_lower_after_selected_checkpoint": 26,
+      "median_tail_mae_increase": 0.004171041452457724
+    },
+    "sunspots": {
+      "fits": 27,
+      "training_loss_lower_after_selected_checkpoint": 27,
+      "median_tail_mae_increase": 0.4586220465766022
+    },
+    "power": {
+      "fits": 27,
+      "training_loss_lower_after_selected_checkpoint": 24,
+      "median_tail_mae_increase": 0.01164884316717929
+    },
+    "retail": {
+      "fits": 27,
+      "training_loss_lower_after_selected_checkpoint": 27,
+      "median_tail_mae_increase": 0.06374986355121326
+    },
+    "rain": {
+      "fits": 27,
+      "training_loss_lower_after_selected_checkpoint": 27,
+      "median_tail_mae_increase": 0.5871314329259505
+    }
+  },
+  "records": [
+    {
+      "dataset": "co2",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 316,
+      "epochs_run": 336,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0001250064000487272
+    },
+    {
+      "dataset": "co2",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 141,
+      "epochs_run": 161,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0005242700986571036
+    },
+    {
+      "dataset": "co2",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 286,
+      "epochs_run": 306,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.00014543272554876086
+    },
+    {
+      "dataset": "co2",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 334,
+      "epochs_run": 354,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0005792007471138727
+    },
+    {
+      "dataset": "co2",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 290,
+      "epochs_run": 310,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.00040843184416655687
+    },
+    {
+      "dataset": "co2",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 245,
+      "epochs_run": 265,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.00038034732763964074
+    },
+    {
+      "dataset": "co2",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 336,
+      "epochs_run": 356,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.00025342191968646954
+    },
+    {
+      "dataset": "co2",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 168,
+      "epochs_run": 188,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.00018499638885316472
+    },
+    {
+      "dataset": "co2",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 181,
+      "epochs_run": 201,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0009835698136251014
+    },
+    {
+      "dataset": "co2",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 19,
+      "epochs_run": 39,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.005222040127964123
+    },
+    {
+      "dataset": "co2",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 21,
+      "epochs_run": 41,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.015504558287560144
+    },
+    {
+      "dataset": "co2",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 20,
+      "epochs_run": 40,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0007168890535836914
+    },
+    {
+      "dataset": "co2",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 102,
+      "epochs_run": 122,
+      "training_mse_lower_at_last_epoch": false,
+      "tail_mae_increase": 0.008286205294230853
+    },
+    {
+      "dataset": "co2",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 169,
+      "epochs_run": 189,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.034583682181934305
+    },
+    {
+      "dataset": "co2",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 79,
+      "epochs_run": 99,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.004351390798885801
+    },
+    {
+      "dataset": "co2",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 60,
+      "epochs_run": 80,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.02622931344700824
+    },
+    {
+      "dataset": "co2",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 69,
+      "epochs_run": 89,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.009975471033580374
+    },
+    {
+      "dataset": "co2",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 74,
+      "epochs_run": 94,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.011470997227088942
+    },
+    {
+      "dataset": "co2",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 31,
+      "epochs_run": 51,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0018003741949797758
+    },
+    {
+      "dataset": "co2",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 64,
+      "epochs_run": 84,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.010161367516965919
+    },
+    {
+      "dataset": "co2",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 37,
+      "epochs_run": 57,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0016878969594841808
+    },
+    {
+      "dataset": "co2",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 87,
+      "epochs_run": 107,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.02322367853174495
+    },
+    {
+      "dataset": "co2",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 103,
+      "epochs_run": 123,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.034599261103814144
+    },
+    {
+      "dataset": "co2",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 75,
+      "epochs_run": 95,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.03892995957905754
+    },
+    {
+      "dataset": "co2",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 66,
+      "epochs_run": 86,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.009629117721425079
+    },
+    {
+      "dataset": "co2",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 26,
+      "epochs_run": 46,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.004171041452457724
+    },
+    {
+      "dataset": "co2",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 29,
+      "epochs_run": 49,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0038135649210622458
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 14,
+      "epochs_run": 34,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 4.197070078531905
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 13,
+      "epochs_run": 33,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 3.7084711303710876
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 10,
+      "epochs_run": 30,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 3.754986490885422
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 20,
+      "epochs_run": 40,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.634590106540255
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 22,
+      "epochs_run": 42,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.4586220465766022
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 6,
+      "epochs_run": 26,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.3930103132459859
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 66,
+      "epochs_run": 86,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.3719290597098208
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 8,
+      "epochs_run": 28,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.2548310488746246
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 40,
+      "epochs_run": 60,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.33530584426153354
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 31,
+      "epochs_run": 51,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.29345909627278033
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 14,
+      "epochs_run": 34,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.41877035522460915
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 24,
+      "epochs_run": 44,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.2723170776367141
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 17,
+      "epochs_run": 37,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.6222369554307701
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 8,
+      "epochs_run": 28,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 1.3223407745361335
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 9,
+      "epochs_run": 29,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 1.3799361928304048
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 9,
+      "epochs_run": 29,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.9216550336565277
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 10,
+      "epochs_run": 30,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.7869899640764508
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 7,
+      "epochs_run": 27,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.8842713492257275
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 17,
+      "epochs_run": 37,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 1.4835468037923185
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 11,
+      "epochs_run": 31,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 2.7132296956380166
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 14,
+      "epochs_run": 34,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 3.3851754659016926
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 14,
+      "epochs_run": 34,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.32041887071397746
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 6,
+      "epochs_run": 26,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.12967514038086492
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 24,
+      "epochs_run": 44,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.07042520311143718
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 11,
+      "epochs_run": 31,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.11164540608724138
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 8,
+      "epochs_run": 28,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.03642394292922191
+    },
+    {
+      "dataset": "sunspots",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 11,
+      "epochs_run": 31,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.31672794160388307
+    },
+    {
+      "dataset": "power",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 8,
+      "epochs_run": 28,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.015986635192549364
+    },
+    {
+      "dataset": "power",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 13,
+      "epochs_run": 33,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.009138503898514588
+    },
+    {
+      "dataset": "power",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 8,
+      "epochs_run": 28,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.017692884293534883
+    },
+    {
+      "dataset": "power",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 17,
+      "epochs_run": 37,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.013059711097004323
+    },
+    {
+      "dataset": "power",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 29,
+      "epochs_run": 49,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0031899475154334167
+    },
+    {
+      "dataset": "power",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 16,
+      "epochs_run": 36,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.004634874459320065
+    },
+    {
+      "dataset": "power",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 67,
+      "epochs_run": 87,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.012526772480651177
+    },
+    {
+      "dataset": "power",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 21,
+      "epochs_run": 41,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0095501029915471
+    },
+    {
+      "dataset": "power",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 29,
+      "epochs_run": 49,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.00568719334679621
+    },
+    {
+      "dataset": "power",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 52,
+      "epochs_run": 72,
+      "training_mse_lower_at_last_epoch": false,
+      "tail_mae_increase": 0.01183508993372509
+    },
+    {
+      "dataset": "power",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 28,
+      "epochs_run": 48,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0038100427424466454
+    },
+    {
+      "dataset": "power",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 5,
+      "epochs_run": 25,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.038156341866054266
+    },
+    {
+      "dataset": "power",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 29,
+      "epochs_run": 49,
+      "training_mse_lower_at_last_epoch": false,
+      "tail_mae_increase": 0.010257142945592712
+    },
+    {
+      "dataset": "power",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 10,
+      "epochs_run": 30,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.01164884316717929
+    },
+    {
+      "dataset": "power",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 7,
+      "epochs_run": 27,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.022960749450703283
+    },
+    {
+      "dataset": "power",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 70,
+      "epochs_run": 90,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0023451938686547547
+    },
+    {
+      "dataset": "power",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 28,
+      "epochs_run": 48,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.01466758348698971
+    },
+    {
+      "dataset": "power",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 33,
+      "epochs_run": 53,
+      "training_mse_lower_at_last_epoch": false,
+      "tail_mae_increase": 0.007572553188712472
+    },
+    {
+      "dataset": "power",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 2,
+      "epochs_run": 22,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.01587358720590093
+    },
+    {
+      "dataset": "power",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 2,
+      "epochs_run": 22,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.020107244029683113
+    },
+    {
+      "dataset": "power",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 8,
+      "epochs_run": 28,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.011891396557127065
+    },
+    {
+      "dataset": "power",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 27,
+      "epochs_run": 47,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.03871738218250498
+    },
+    {
+      "dataset": "power",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 12,
+      "epochs_run": 32,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0243248347246644
+    },
+    {
+      "dataset": "power",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 32,
+      "epochs_run": 52,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.00995892620431671
+    },
+    {
+      "dataset": "power",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 15,
+      "epochs_run": 35,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.006115562821428
+    },
+    {
+      "dataset": "power",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 30,
+      "epochs_run": 50,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0053606610659096
+    },
+    {
+      "dataset": "power",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 23,
+      "epochs_run": 43,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0028684428515448612
+    },
+    {
+      "dataset": "retail",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 13,
+      "epochs_run": 33,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.07248820499940345
+    },
+    {
+      "dataset": "retail",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 6,
+      "epochs_run": 26,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.26857311400500294
+    },
+    {
+      "dataset": "retail",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 19,
+      "epochs_run": 39,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.18061795288866345
+    },
+    {
+      "dataset": "retail",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 22,
+      "epochs_run": 42,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.05571474295396017
+    },
+    {
+      "dataset": "retail",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 42,
+      "epochs_run": 62,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.017417857280144444
+    },
+    {
+      "dataset": "retail",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 30,
+      "epochs_run": 50,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.06374986355121326
+    },
+    {
+      "dataset": "retail",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 15,
+      "epochs_run": 35,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.05895260995434215
+    },
+    {
+      "dataset": "retail",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 11,
+      "epochs_run": 31,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.1028406393143445
+    },
+    {
+      "dataset": "retail",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 23,
+      "epochs_run": 43,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.11330902461082715
+    },
+    {
+      "dataset": "retail",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 12,
+      "epochs_run": 32,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.021579834006049903
+    },
+    {
+      "dataset": "retail",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 18,
+      "epochs_run": 38,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.005200372500853145
+    },
+    {
+      "dataset": "retail",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 11,
+      "epochs_run": 31,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0599554137750109
+    },
+    {
+      "dataset": "retail",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 27,
+      "epochs_run": 47,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.025201217486308103
+    },
+    {
+      "dataset": "retail",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 21,
+      "epochs_run": 41,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.04633032817106986
+    },
+    {
+      "dataset": "retail",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 15,
+      "epochs_run": 35,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.08297870296698306
+    },
+    {
+      "dataset": "retail",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 2,
+      "epochs_run": 22,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.05628606081009013
+    },
+    {
+      "dataset": "retail",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 9,
+      "epochs_run": 29,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.08479813952599846
+    },
+    {
+      "dataset": "retail",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 10,
+      "epochs_run": 30,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.08981617266131958
+    },
+    {
+      "dataset": "retail",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 12,
+      "epochs_run": 32,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.2066141236912129
+    },
+    {
+      "dataset": "retail",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 7,
+      "epochs_run": 27,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.18342013792558154
+    },
+    {
+      "dataset": "retail",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 14,
+      "epochs_run": 34,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.26752166260372545
+    },
+    {
+      "dataset": "retail",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 54,
+      "epochs_run": 74,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.024961157486989016
+    },
+    {
+      "dataset": "retail",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 48,
+      "epochs_run": 68,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0066327315110426
+    },
+    {
+      "dataset": "retail",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 36,
+      "epochs_run": 56,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.008372641068238984
+    },
+    {
+      "dataset": "retail",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 15,
+      "epochs_run": 35,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.11384993983853253
+    },
+    {
+      "dataset": "retail",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 12,
+      "epochs_run": 32,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.0874193868329447
+    },
+    {
+      "dataset": "retail",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 14,
+      "epochs_run": 34,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.04758982158476277
+    },
+    {
+      "dataset": "rain",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 35,
+      "epochs_run": 55,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 5.8375335827208445
+    },
+    {
+      "dataset": "rain",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 3,
+      "epochs_run": 23,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.3604407862613037
+    },
+    {
+      "dataset": "rain",
+      "architecture": "elman",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 3,
+      "epochs_run": 23,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 1.1157775745057243
+    },
+    {
+      "dataset": "rain",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 18,
+      "epochs_run": 38,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 1.5304231419282814
+    },
+    {
+      "dataset": "rain",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 12,
+      "epochs_run": 32,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 1.703372843125294
+    },
+    {
+      "dataset": "rain",
+      "architecture": "elman",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 12,
+      "epochs_run": 32,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 1.3792512781479829
+    },
+    {
+      "dataset": "rain",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 14,
+      "epochs_run": 34,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.9700228437592671
+    },
+    {
+      "dataset": "rain",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 10,
+      "epochs_run": 30,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 1.1297119913221962
+    },
+    {
+      "dataset": "rain",
+      "architecture": "elman",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 10,
+      "epochs_run": 30,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 1.554282224631013
+    },
+    {
+      "dataset": "rain",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 9,
+      "epochs_run": 29,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.052008110180235434
+    },
+    {
+      "dataset": "rain",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 124,
+      "epochs_run": 144,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.007085084078607196
+    },
+    {
+      "dataset": "rain",
+      "architecture": "jordan",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 10,
+      "epochs_run": 30,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.7671351114908802
+    },
+    {
+      "dataset": "rain",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 5,
+      "epochs_run": 25,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.5871314329259505
+    },
+    {
+      "dataset": "rain",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 3,
+      "epochs_run": 23,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.4836021872127745
+    },
+    {
+      "dataset": "rain",
+      "architecture": "jordan",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 10,
+      "epochs_run": 30,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.2754475537468366
+    },
+    {
+      "dataset": "rain",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 5,
+      "epochs_run": 25,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.20480947373788183
+    },
+    {
+      "dataset": "rain",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 4,
+      "epochs_run": 24,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.1456021852131144
+    },
+    {
+      "dataset": "rain",
+      "architecture": "jordan",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 8,
+      "epochs_run": 28,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.10737623383726813
+    },
+    {
+      "dataset": "rain",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 11,
+      "best_epoch": 13,
+      "epochs_run": 33,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.11575709560461789
+    },
+    {
+      "dataset": "rain",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 23,
+      "best_epoch": 11,
+      "epochs_run": 31,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.1185640033922688
+    },
+    {
+      "dataset": "rain",
+      "architecture": "multi",
+      "fold": 1,
+      "seed": 37,
+      "best_epoch": 10,
+      "epochs_run": 30,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.9955068354021002
+    },
+    {
+      "dataset": "rain",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 11,
+      "best_epoch": 2,
+      "epochs_run": 22,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.9158041336957154
+    },
+    {
+      "dataset": "rain",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 23,
+      "best_epoch": 37,
+      "epochs_run": 57,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.5277447980992918
+    },
+    {
+      "dataset": "rain",
+      "architecture": "multi",
+      "fold": 2,
+      "seed": 37,
+      "best_epoch": 32,
+      "epochs_run": 52,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 4.718380613888002
+    },
+    {
+      "dataset": "rain",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 11,
+      "best_epoch": 40,
+      "epochs_run": 60,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 1.0474167642714072
+    },
+    {
+      "dataset": "rain",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 23,
+      "best_epoch": 21,
+      "epochs_run": 41,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.2772657080541734
+    },
+    {
+      "dataset": "rain",
+      "architecture": "multi",
+      "fold": 3,
+      "seed": 37,
+      "best_epoch": 17,
+      "epochs_run": 37,
+      "training_mse_lower_at_last_epoch": true,
+      "tail_mae_increase": 0.2699726925620567
+    }
+  ]
+}

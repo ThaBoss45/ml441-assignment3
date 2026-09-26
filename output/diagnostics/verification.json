@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "datasets": 5,
+  "selection_records": 540,
+  "final_network_records": 45,
+  "raw_hashes": 5,
+  "checks": [
+    "chronology",
+    "selection minimum",
+    "selected epoch",
+    "scaler scope",
+    "parameter count",
+    "target alignment",
+    "MAE",
+    "RMSE",
+    "MASE",
+    "baselines"
+  ]
+}
