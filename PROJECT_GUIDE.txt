@@ -1,0 +1,52 @@
+Machine Learning 441 Assignment 3, Option 4
+D. Moolman, 27187314
+
+The report is report/27187314RW441assignment3.pdf. The forecasting code is
+in src/, the executable experiment log is notebooks/experiment_log.ipynb,
+and the frozen protocol is configs/primary_protocol.json. All five raw source
+snapshots are in data/raw/. Their expected SHA-256 hashes are in the protocol.
+The experiment records are in output/pilot/, output/primary/, and
+output/diagnostics/. The notebook exports compact tables to notebooks/exports/.
+
+Data sources and local files:
+
+NOAA Global Monitoring Laboratory, Mauna Loa monthly carbon dioxide:
+data/raw/co2_mm_mlo.csv
+https://gml.noaa.gov/ccgg/trends/data.html
+Terms: https://gml.noaa.gov/ccgg/data/datause.html
+
+WDC-SILSO, Royal Observatory of Belgium, monthly total sunspot number:
+data/raw/SN_m_tot_V2.0.csv
+https://sidc.be/SILSO/citations
+DOI: 10.24414/qnza-ac80. Licence: CC BY-NC 4.0.
+
+G. Hebrail and A. Berard, individual household electric power consumption:
+data/raw/household_power_consumption.zip
+https://archive.ics.uci.edu/dataset/235/individual+household+electric+power+consumption
+DOI: 10.24432/C58K54. Licence: CC BY 4.0.
+
+Office for National Statistics, retail volume index J448:
+data/raw/ons_j448.csv
+https://www.ons.gov.uk/businessindustryandtrade/retailindustry/timeseries/j448/drsi
+Terms: Open Government Licence 3.0.
+
+Met Office HadEWP, England and Wales monthly precipitation:
+data/raw/HadEWP_monthly_totals.txt
+https://www.metoffice.gov.uk/hadobs/hadukp/data/download.html
+Terms: Open Government Licence.
+
+Run on Linux with Python 3.12 and the packages in requirements.txt. Run
+python -m pytest -q tests to check the implementation. Open the notebook
+with jupyter lab notebooks/experiment_log.ipynb and run cells in order.
+Notebook stages archive source hashes and tests, the development pilot,
+development data audit, 540 validation fold-and-seed fits, 45 final network
+fits and baselines, then independent verification and diagnostics. The source
+code implements separate Elman, Jordan and combined-feedback recurrent nets.
+
+The existing Git commits are an archive of completed experiments. Their
+commit times are not the original training times. The notebook is idempotent
+for existing records and commits only changed stage files. It does not push
+unless ML441_NOTEBOOK_PUSH=1 is set in the Jupyter process environment and a
+remote named origin is configured. Before each push, review git status and
+git diff. Supplied course PDFs, local planning documents, Markdown files,
+temporary files and Python caches remain local and are excluded from Git.

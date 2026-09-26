@@ -1,0 +1,3 @@
+data/raw/*.csv -text -diff
+data/raw/*.txt -text -diff
+data/raw/*.zip -text -diff
