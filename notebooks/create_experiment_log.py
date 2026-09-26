@@ -252,10 +252,79 @@ publish_stage("Archive verification diagnostics and report", [
 
 code("print('Remote upload: Push reviewed commits only')")
 
+code("print('Stage 7: Post-hoc supplementary diagnostics and revised report')")
+
+code("""
+run_module("src.supplementary_analysis")
+paired = json.loads((ROOT / "output/diagnostics/paired_errors.json").read_text())
+capacity = json.loads((ROOT / "output/diagnostics/capacity_sensitivity.json").read_text())
+fit = json.loads((ROOT / "output/diagnostics/fit_sensitivity.json").read_text())
+stationarity = json.loads((ROOT / "output/diagnostics/stationarity_sensitivity.json").read_text())
+paired_table = pd.DataFrame(paired["results"])
+capacity_table = pd.DataFrame([{
+    "dataset": row["dataset"],
+    "small_leader": row["budgets"][0]["leader"],
+    "small_validation_mae": row["budgets"][0]["leader_mean_validation_mae"],
+    "large_leader": row["budgets"][1]["leader"],
+    "large_validation_mae": row["budgets"][1]["leader_mean_validation_mae"]}
+    for row in capacity["results"]])
+fit_table = pd.DataFrame([{key: value for key, value in row.items() if key != "rows"}
+                          for row in fit["results"]])
+stationarity_table = pd.DataFrame([{
+    "dataset": row["dataset"],
+    "level_adf_trend_p": row["series"]["level"]["tests"]["ct"]["adf_unit_root_null_p"],
+    "level_kpss_trend_p": row["series"]["level"]["tests"]["ct"]["kpss_stationarity_null_p"],
+    "modelled_adf_trend_p": row["series"]["modelled_target"]["tests"]["ct"]["adf_unit_root_null_p"],
+    "modelled_kpss_trend_p": row["series"]["modelled_target"]["tests"]["ct"]["kpss_stationarity_null_p"]}
+    for row in stationarity["results"]])
+paired_table.to_csv(EXPORT / "paired_error_diagnostic.csv", index=False)
+capacity_table.to_csv(EXPORT / "capacity_diagnostic.csv", index=False)
+fit_table.to_csv(EXPORT / "fit_diagnostic.csv", index=False)
+stationarity_table.to_csv(EXPORT / "stationarity_sensitivity.csv", index=False)
+display(paired_table[["dataset", "winner", "runner", "relative_advantage_percent",
+                      "paired_seed_wins"]])
+display(capacity_table)
+display(fit_table)
+display(stationarity_table)
+run_module("src.make_report_assets")
+""")
+
+code("""
+import shutil
+
+for command in (["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "main.tex"],
+                ["bibtex", "main"],
+                ["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "main.tex"],
+                ["pdflatex", "-interaction=nonstopmode", "-halt-on-error", "main.tex"]):
+    result = subprocess.run(command, cwd=ROOT / "report", text=True, capture_output=True)
+    if result.returncode:
+        print(result.stdout[-3000:])
+        print(result.stderr[-1000:])
+        raise RuntimeError("Report build failed")
+shutil.copy2(ROOT / "report/main.pdf",
+             ROOT / "report/27187314RW441assignment3.pdf")
+print("report/27187314RW441assignment3.pdf")
+""")
+
+code("""
+publish_stage("Add post-hoc diagnostic code", [
+    "src/supplementary_analysis.py", "src/make_report_assets.py"])
+""")
 
 notebook = nbf.v4.new_notebook(cells=cells)
 notebook.metadata["kernelspec"] = {"display_name": "Python 3", "language": "python", "name": "python3"}
 notebook.metadata["language_info"] = {"name": "python", "version": "3.12"}
 destination = Path(__file__).with_name("experiment_log.ipynb")
+if destination.exists():
+    previous = nbf.read(destination, as_version=4)
+    saved_cells = {cell.source: cell for cell in previous.cells if cell.cell_type == "code"}
+    for cell in notebook.cells:
+        saved = saved_cells.get(cell.source)
+        if saved is not None:
+            cell.id = saved.id
+            cell.execution_count = saved.execution_count
+            cell.outputs = saved.outputs
+            cell.metadata = saved.metadata
+    notebook.metadata = previous.metadata
 nbf.write(notebook, destination)
 print(destination)
