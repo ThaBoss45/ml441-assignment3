@@ -1,0 +1,43 @@
+{
+  "dataset": "retail",
+  "test_start_date": "2018-08-01",
+  "test_target_count": 89,
+  "baselines": {
+    "persistence": {
+      "mae": 7.068539325842697,
+      "rmse": 11.416295272670945,
+      "mase": 1.3543315227042185
+    },
+    "seasonal_naive": {
+      "mae": 3.9775280898876404,
+      "rmse": 5.736831525768922,
+      "mase": 0.7620940375731892
+    }
+  },
+  "networks": {
+    "elman": {
+      "mean_mae": 3.4574873586718957,
+      "sd_mae": 0.029536357389171677,
+      "mean_rmse": 5.1378478563856085,
+      "mean_mase": 0.6624542785071719,
+      "parameters": 89,
+      "epochs": 19
+    },
+    "jordan": {
+      "mean_mae": 3.4158825704220974,
+      "sd_mae": 0.12024458715119873,
+      "mean_rmse": 5.121110879374728,
+      "mean_mase": 0.6544828046814365,
+      "parameters": 385,
+      "epochs": 12
+    },
+    "multi": {
+      "mean_mae": 3.4950402330369976,
+      "sd_mae": 0.03979182512061191,
+      "mean_rmse": 5.237028545435383,
+      "mean_mase": 0.6696494059834905,
+      "parameters": 397,
+      "epochs": 14
+    }
+  }
+}

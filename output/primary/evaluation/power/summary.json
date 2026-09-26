@@ -1,0 +1,43 @@
+{
+  "dataset": "power",
+  "test_start_date": "2010-02-11",
+  "test_target_count": 276,
+  "baselines": {
+    "persistence": {
+      "mae": 0.19931885401524585,
+      "rmse": 0.27769347938850913,
+      "mase": 0.6913019433063218
+    },
+    "seasonal_naive": {
+      "mae": 0.2447485225386882,
+      "rmse": 0.3303924882246117,
+      "mase": 0.8488666568362095
+    }
+  },
+  "networks": {
+    "elman": {
+      "mean_mae": 0.1688999403268161,
+      "sd_mae": 0.002275111080678907,
+      "mean_rmse": 0.23554583120213848,
+      "mean_mase": 0.5857993592684351,
+      "parameters": 379,
+      "epochs": 17
+    },
+    "jordan": {
+      "mean_mae": 0.19630114829218182,
+      "sd_mae": 0.02654885457146813,
+      "mean_rmse": 0.2544660993399224,
+      "mean_mase": 0.6808355685070707,
+      "parameters": 385,
+      "epochs": 28
+    },
+    "multi": {
+      "mean_mae": 0.1725550243269205,
+      "sd_mae": 0.002503177901915694,
+      "mean_rmse": 0.23967091980084979,
+      "mean_mase": 0.598476367094432,
+      "parameters": 397,
+      "epochs": 15
+    }
+  }
+}

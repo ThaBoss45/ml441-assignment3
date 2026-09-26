@@ -1,0 +1,38 @@
+{
+  "dataset": "sunspots",
+  "test_start_date": "2000-10-01",
+  "test_target_count": 303,
+  "baselines": {
+    "persistence": {
+      "mae": 14.219141914191418,
+      "rmse": 20.25620224457036,
+      "mase": 0.7073704697763095
+    }
+  },
+  "networks": {
+    "elman": {
+      "mean_mae": 13.412830262136934,
+      "sd_mae": 0.10019141555570354,
+      "mean_rmse": 18.742753245188354,
+      "mean_mase": 0.6672582706336421,
+      "parameters": 379,
+      "epochs": 14
+    },
+    "jordan": {
+      "mean_mae": 14.36592716431067,
+      "sd_mae": 0.4647629659565754,
+      "mean_rmse": 19.602571325311573,
+      "mean_mase": 0.7146727072783811,
+      "parameters": 385,
+      "epochs": 10
+    },
+    "multi": {
+      "mean_mae": 13.511974414451943,
+      "sd_mae": 0.13152566537758303,
+      "mean_rmse": 18.95873827298386,
+      "mean_mase": 0.6721904702010892,
+      "parameters": 397,
+      "epochs": 11
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "dataset": "rain",
+  "test_start_date": "2007-01-01",
+  "test_target_count": 228,
+  "baselines": {
+    "persistence": {
+      "mae": 39.57368421052631,
+      "rmse": 49.08976203692686,
+      "mase": 1.056479585391919
+    },
+    "seasonal_naive": {
+      "mae": 42.041228070175436,
+      "rmse": 51.70660991374246,
+      "mase": 1.1223544152386955
+    }
+  },
+  "networks": {
+    "elman": {
+      "mean_mae": 30.00873746593096,
+      "sd_mae": 0.5269126186792322,
+      "mean_rmse": 37.22727642102864,
+      "mean_mase": 0.8011288094250463,
+      "parameters": 379,
+      "epochs": 12
+    },
+    "jordan": {
+      "mean_mae": 31.45440862109089,
+      "sd_mae": 0.18026045596037074,
+      "mean_rmse": 38.72401856496194,
+      "mean_mase": 0.8397231958989284,
+      "parameters": 97,
+      "epochs": 8
+    },
+    "multi": {
+      "mean_mae": 30.88497157738223,
+      "sd_mae": 0.46884086411024334,
+      "mean_rmse": 38.08810646854854,
+      "mean_mase": 0.8245212094312618,
+      "parameters": 397,
+      "epochs": 17
+    }
+  }
+}
