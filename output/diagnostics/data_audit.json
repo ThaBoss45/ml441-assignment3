@@ -1,0 +1,227 @@
+[
+  {
+    "dataset": "co2",
+    "modelled_n": 813,
+    "first_date": "1958-04-01",
+    "last_date": "2025-12-01",
+    "test_start": "2012-06-01",
+    "development_n": 650,
+    "test_n": 163,
+    "development_missing": 0,
+    "test_missing_count_for_integrity_only": 0,
+    "level_min_development": 312.42,
+    "level_max_development": 396.93,
+    "first_half_mean": 328.1688923076924,
+    "second_half_mean": 368.2189538461538,
+    "development_level": {
+      "adf_unit_root_null_p": 1.0,
+      "kpss_level_stationarity_null_p": 0.01
+    },
+    "development_modelled_target": {
+      "adf_unit_root_null_p": 3.7204043658877173e-06,
+      "kpss_level_stationarity_null_p": 0.1
+    },
+    "folds": [
+      {
+        "number": 1,
+        "fit_end": 367,
+        "stop_end": 407,
+        "valid_end": 488
+      },
+      {
+        "number": 2,
+        "fit_end": 440,
+        "stop_end": 488,
+        "valid_end": 569
+      },
+      {
+        "number": 3,
+        "fit_end": 513,
+        "stop_end": 569,
+        "valid_end": 650
+      }
+    ],
+    "unit": "ppm",
+    "source_note": "NOAA average column; source includes historical interpolations and pre-1974 Scripps measurements"
+  },
+  {
+    "dataset": "sunspots",
+    "modelled_n": 1512,
+    "first_date": "1900-01-01",
+    "last_date": "2025-12-01",
+    "test_start": "2000-10-01",
+    "development_n": 1209,
+    "test_n": 303,
+    "development_missing": 0,
+    "test_missing_count_for_integrity_only": 0,
+    "level_min_development": 0.0,
+    "level_max_development": 359.4,
+    "first_half_mean": 78.42115702479339,
+    "second_half_mean": 103.05496688741721,
+    "development_level": {
+      "adf_unit_root_null_p": 7.425327020497978e-10,
+      "kpss_level_stationarity_null_p": 0.05605712106755777
+    },
+    "development_modelled_target": {
+      "adf_unit_root_null_p": 7.425327020497978e-10,
+      "kpss_level_stationarity_null_p": 0.05605712106755777
+    },
+    "folds": [
+      {
+        "number": 1,
+        "fit_end": 681,
+        "stop_end": 756,
+        "valid_end": 907
+      },
+      {
+        "number": 2,
+        "fit_end": 817,
+        "stop_end": 907,
+        "valid_end": 1058
+      },
+      {
+        "number": 3,
+        "fit_end": 953,
+        "stop_end": 1058,
+        "valid_end": 1209
+      }
+    ],
+    "unit": "sunspot number",
+    "source_note": "SILSO version 2 monthly total; 2025 definitive flags audited separately"
+  },
+  {
+    "dataset": "power",
+    "modelled_n": 1440,
+    "first_date": "2006-12-17",
+    "last_date": "2010-11-25",
+    "test_start": "2010-02-11",
+    "development_n": 1152,
+    "test_n": 288,
+    "development_missing": 11,
+    "test_missing_count_for_integrity_only": 12,
+    "level_min_development": 0.17381805555555555,
+    "level_max_development": 3.314851388888889,
+    "first_half_mean": 1.1459682423475845,
+    "second_half_mean": 1.073978574690468,
+    "development_level": {
+      "adf_unit_root_null_p": 0.027533716564373072,
+      "kpss_level_stationarity_null_p": 0.1
+    },
+    "development_modelled_target": {
+      "adf_unit_root_null_p": 0.027533716564373072,
+      "kpss_level_stationarity_null_p": 0.1
+    },
+    "folds": [
+      {
+        "number": 1,
+        "fit_end": 648,
+        "stop_end": 720,
+        "valid_end": 864
+      },
+      {
+        "number": 2,
+        "fit_end": 778,
+        "stop_end": 864,
+        "valid_end": 1008
+      },
+      {
+        "number": 3,
+        "fit_end": 908,
+        "stop_end": 1008,
+        "valid_end": 1152
+      }
+    ],
+    "unit": "kW",
+    "source_note": "UCI minute active power aggregated to daily mean; at least 95% coverage required"
+  },
+  {
+    "dataset": "retail",
+    "modelled_n": 444,
+    "first_date": "1989-01-01",
+    "last_date": "2025-12-01",
+    "test_start": "2018-08-01",
+    "development_n": 355,
+    "test_n": 89,
+    "development_missing": 0,
+    "test_missing_count_for_integrity_only": 0,
+    "level_min_development": 48.5,
+    "level_max_development": 125.8,
+    "first_half_mean": 60.23820224719102,
+    "second_half_mean": 87.04237288135592,
+    "development_level": {
+      "adf_unit_root_null_p": 0.9537990418110243,
+      "kpss_level_stationarity_null_p": 0.01
+    },
+    "development_modelled_target": {
+      "adf_unit_root_null_p": 0.15802038708238947,
+      "kpss_level_stationarity_null_p": 0.1
+    },
+    "folds": [
+      {
+        "number": 1,
+        "fit_end": 201,
+        "stop_end": 223,
+        "valid_end": 267
+      },
+      {
+        "number": 2,
+        "fit_end": 241,
+        "stop_end": 267,
+        "valid_end": 311
+      },
+      {
+        "number": 3,
+        "fit_end": 280,
+        "stop_end": 311,
+        "valid_end": 355
+      }
+    ],
+    "unit": "volume index",
+    "source_note": "ONS J448 unadjusted all-retailers-ex-fuel volume index"
+  },
+  {
+    "dataset": "rain",
+    "modelled_n": 1140,
+    "first_date": "1931-01-01",
+    "last_date": "2025-12-01",
+    "test_start": "2007-01-01",
+    "development_n": 912,
+    "test_n": 228,
+    "development_missing": 0,
+    "test_missing_count_for_integrity_only": 0,
+    "level_min_development": 7.1,
+    "level_max_development": 196.5,
+    "first_half_mean": 76.8688596491228,
+    "second_half_mean": 77.19210526315791,
+    "development_level": {
+      "adf_unit_root_null_p": 1.6144392660128138e-09,
+      "kpss_level_stationarity_null_p": 0.1
+    },
+    "development_modelled_target": {
+      "adf_unit_root_null_p": 1.6144392660128138e-09,
+      "kpss_level_stationarity_null_p": 0.1
+    },
+    "folds": [
+      {
+        "number": 1,
+        "fit_end": 513,
+        "stop_end": 570,
+        "valid_end": 684
+      },
+      {
+        "number": 2,
+        "fit_end": 616,
+        "stop_end": 684,
+        "valid_end": 798
+      },
+      {
+        "number": 3,
+        "fit_end": 719,
+        "stop_end": 798,
+        "valid_end": 912
+      }
+    ],
+    "unit": "mm",
+    "source_note": "Met Office HadEWP monthly England and Wales precipitation"
+  }
+]
