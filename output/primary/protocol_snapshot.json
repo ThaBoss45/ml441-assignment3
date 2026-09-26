@@ -1,0 +1,99 @@
+{
+  "version": "1.0-frozen-before-primary",
+  "data_cutoff": "2025-12-31",
+  "datasets": [
+    "co2",
+    "sunspots",
+    "power",
+    "retail",
+    "rain"
+  ],
+  "forecast_horizon_steps": 1,
+  "series_definitions": {
+    "co2": {
+      "history": 24,
+      "difference_lag": 1,
+      "seasonal_naive_lag": 12
+    },
+    "sunspots": {
+      "history": 60,
+      "difference_lag": 0,
+      "seasonal_naive_lag": null
+    },
+    "power": {
+      "history": 28,
+      "difference_lag": 0,
+      "seasonal_naive_lag": 7
+    },
+    "retail": {
+      "history": 24,
+      "difference_lag": 12,
+      "seasonal_naive_lag": 12
+    },
+    "rain": {
+      "history": 24,
+      "difference_lag": 0,
+      "seasonal_naive_lag": 12
+    }
+  },
+  "split": {
+    "development_fraction": 0.8,
+    "validation_block_fraction_of_full_series": 0.1,
+    "expanding_validation_blocks": 3,
+    "early_stopping_tail_fraction": 0.1,
+    "gap": 0,
+    "test_policy": "one-step rolling origins with newly observed past test values available to later origins"
+  },
+  "architectures": [
+    "elman",
+    "jordan",
+    "multi"
+  ],
+  "hidden_grid": {
+    "elman": [
+      8,
+      18
+    ],
+    "jordan": [
+      24,
+      96
+    ],
+    "multi": [
+      8,
+      18
+    ]
+  },
+  "learning_rate_grid": [
+    0.003,
+    0.01
+  ],
+  "seeds": [
+    11,
+    23,
+    37
+  ],
+  "optimizer": "Adam",
+  "training_loss": "scaled mean squared error",
+  "batch_size": 256,
+  "weight_decay": 0.0001,
+  "gradient_clip_norm": 1.0,
+  "max_epochs": 400,
+  "patience": 20,
+  "primary_selection_metric": "mean validation MAE across three folds and three seeds",
+  "selection_tie_rule": "lower parameter count, then lower learning rate for exact numerical ties",
+  "final_epoch_policy": "rounded median best epoch of the selected configuration across folds and seeds; refit all development observations",
+  "primary_test_metric": "MAE in original target units",
+  "supporting_test_metrics": [
+    "RMSE",
+    "MASE using training-period first-difference scale"
+  ],
+  "missing_power_policy": "daily target is absent below 95 percent minute coverage; causal forward fill only for model inputs; missing targets are never fitted or scored",
+  "stationarity_policy": "development-only level plots, rolling summaries, ADF and KPSS; outcomes are qualified",
+  "raw_sha256": {
+    "co2_mm_mlo.csv": "dcf0198658c87ebb5e3b2ce807fe3a52e1d5f000aa0479fb1bf334afb7adde4d",
+    "SN_m_tot_V2.0.csv": "6383f7c67fc2e67ef72a2035a1f2233d4564316560c49bcf76bfb62ae5463131",
+    "household_power_consumption.zip": "9f84b46ade8a2d8e1286ec4b2b6c2987a45a755c59f263be3b3b3d10dfbda3ff",
+    "ons_j448.csv": "72fb945d0c16f4623f161d81df1d16353aaaec024f02f40b25279f537fe9c84e",
+    "HadEWP_monthly_totals.txt": "202d0ba7360429539a0d3dd458b1c9b712d9b4dd8c386131d5d098740bb99739"
+  }
+}

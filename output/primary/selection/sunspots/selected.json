@@ -1,0 +1,55 @@
+{
+  "dataset": "sunspots",
+  "n": 1512,
+  "development_end": 1209,
+  "validation_block": 151,
+  "history": 60,
+  "difference_lag": 0,
+  "test_start_date": "2000-10-01",
+  "folds": [
+    {
+      "number": 1,
+      "fit_end": 681,
+      "stop_end": 756,
+      "valid_end": 907
+    },
+    {
+      "number": 2,
+      "fit_end": 817,
+      "stop_end": 907,
+      "valid_end": 1058
+    },
+    {
+      "number": 3,
+      "fit_end": 953,
+      "stop_end": 1058,
+      "valid_end": 1209
+    }
+  ],
+  "selected": {
+    "elman": {
+      "hidden": 18,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 18.992990835946305,
+      "parameter_count": 379,
+      "epochs": 14,
+      "cap_limited_fits": 0
+    },
+    "jordan": {
+      "hidden": 96,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 18.921694924394554,
+      "parameter_count": 385,
+      "epochs": 10,
+      "cap_limited_fits": 0
+    },
+    "multi": {
+      "hidden": 18,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 18.993320478561433,
+      "parameter_count": 397,
+      "epochs": 11,
+      "cap_limited_fits": 0
+    }
+  }
+}

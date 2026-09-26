@@ -1,0 +1,277 @@
+{
+  "co2": {
+    "dataset": "co2",
+    "n": 813,
+    "development_end": 650,
+    "validation_block": 81,
+    "history": 24,
+    "difference_lag": 1,
+    "test_start_date": "2012-06-01",
+    "folds": [
+      {
+        "number": 1,
+        "fit_end": 367,
+        "stop_end": 407,
+        "valid_end": 488
+      },
+      {
+        "number": 2,
+        "fit_end": 440,
+        "stop_end": 488,
+        "valid_end": 569
+      },
+      {
+        "number": 3,
+        "fit_end": 513,
+        "stop_end": 569,
+        "valid_end": 650
+      }
+    ],
+    "selected": {
+      "elman": {
+        "hidden": 18,
+        "learning_rate": 0.003,
+        "mean_validation_mae": 0.25628381162227837,
+        "parameter_count": 379,
+        "epochs": 286,
+        "cap_limited_fits": 0
+      },
+      "jordan": {
+        "hidden": 96,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 0.5746995030682859,
+        "parameter_count": 385,
+        "epochs": 69,
+        "cap_limited_fits": 0
+      },
+      "multi": {
+        "hidden": 18,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 0.2704814420675227,
+        "parameter_count": 397,
+        "epochs": 64,
+        "cap_limited_fits": 0
+      }
+    }
+  },
+  "sunspots": {
+    "dataset": "sunspots",
+    "n": 1512,
+    "development_end": 1209,
+    "validation_block": 151,
+    "history": 60,
+    "difference_lag": 0,
+    "test_start_date": "2000-10-01",
+    "folds": [
+      {
+        "number": 1,
+        "fit_end": 681,
+        "stop_end": 756,
+        "valid_end": 907
+      },
+      {
+        "number": 2,
+        "fit_end": 817,
+        "stop_end": 907,
+        "valid_end": 1058
+      },
+      {
+        "number": 3,
+        "fit_end": 953,
+        "stop_end": 1058,
+        "valid_end": 1209
+      }
+    ],
+    "selected": {
+      "elman": {
+        "hidden": 18,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 18.992990835946305,
+        "parameter_count": 379,
+        "epochs": 14,
+        "cap_limited_fits": 0
+      },
+      "jordan": {
+        "hidden": 96,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 18.921694924394554,
+        "parameter_count": 385,
+        "epochs": 10,
+        "cap_limited_fits": 0
+      },
+      "multi": {
+        "hidden": 18,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 18.993320478561433,
+        "parameter_count": 397,
+        "epochs": 11,
+        "cap_limited_fits": 0
+      }
+    }
+  },
+  "power": {
+    "dataset": "power",
+    "n": 1440,
+    "development_end": 1152,
+    "validation_block": 144,
+    "history": 28,
+    "difference_lag": 0,
+    "test_start_date": "2010-02-11",
+    "folds": [
+      {
+        "number": 1,
+        "fit_end": 648,
+        "stop_end": 720,
+        "valid_end": 864
+      },
+      {
+        "number": 2,
+        "fit_end": 778,
+        "stop_end": 864,
+        "valid_end": 1008
+      },
+      {
+        "number": 3,
+        "fit_end": 908,
+        "stop_end": 1008,
+        "valid_end": 1152
+      }
+    ],
+    "selected": {
+      "elman": {
+        "hidden": 18,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 0.21155645523086763,
+        "parameter_count": 379,
+        "epochs": 17,
+        "cap_limited_fits": 0
+      },
+      "jordan": {
+        "hidden": 96,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 0.219081807296575,
+        "parameter_count": 385,
+        "epochs": 28,
+        "cap_limited_fits": 0
+      },
+      "multi": {
+        "hidden": 18,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 0.2122285399567472,
+        "parameter_count": 397,
+        "epochs": 15,
+        "cap_limited_fits": 0
+      }
+    }
+  },
+  "retail": {
+    "dataset": "retail",
+    "n": 444,
+    "development_end": 355,
+    "validation_block": 44,
+    "history": 24,
+    "difference_lag": 12,
+    "test_start_date": "2018-08-01",
+    "folds": [
+      {
+        "number": 1,
+        "fit_end": 201,
+        "stop_end": 223,
+        "valid_end": 267
+      },
+      {
+        "number": 2,
+        "fit_end": 241,
+        "stop_end": 267,
+        "valid_end": 311
+      },
+      {
+        "number": 3,
+        "fit_end": 280,
+        "stop_end": 311,
+        "valid_end": 355
+      }
+    ],
+    "selected": {
+      "elman": {
+        "hidden": 8,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 1.3951780203315953,
+        "parameter_count": 89,
+        "epochs": 19,
+        "cap_limited_fits": 0
+      },
+      "jordan": {
+        "hidden": 96,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 1.3826419135235781,
+        "parameter_count": 385,
+        "epochs": 12,
+        "cap_limited_fits": 0
+      },
+      "multi": {
+        "hidden": 18,
+        "learning_rate": 0.003,
+        "mean_validation_mae": 1.4268999547067318,
+        "parameter_count": 397,
+        "epochs": 14,
+        "cap_limited_fits": 0
+      }
+    }
+  },
+  "rain": {
+    "dataset": "rain",
+    "n": 1140,
+    "development_end": 912,
+    "validation_block": 114,
+    "history": 24,
+    "difference_lag": 0,
+    "test_start_date": "2007-01-01",
+    "folds": [
+      {
+        "number": 1,
+        "fit_end": 513,
+        "stop_end": 570,
+        "valid_end": 684
+      },
+      {
+        "number": 2,
+        "fit_end": 616,
+        "stop_end": 684,
+        "valid_end": 798
+      },
+      {
+        "number": 3,
+        "fit_end": 719,
+        "stop_end": 798,
+        "valid_end": 912
+      }
+    ],
+    "selected": {
+      "elman": {
+        "hidden": 18,
+        "learning_rate": 0.01,
+        "mean_validation_mae": 29.427084456921552,
+        "parameter_count": 379,
+        "epochs": 12,
+        "cap_limited_fits": 0
+      },
+      "jordan": {
+        "hidden": 24,
+        "learning_rate": 0.003,
+        "mean_validation_mae": 29.695069550631345,
+        "parameter_count": 97,
+        "epochs": 8,
+        "cap_limited_fits": 0
+      },
+      "multi": {
+        "hidden": 18,
+        "learning_rate": 0.003,
+        "mean_validation_mae": 29.790388579489427,
+        "parameter_count": 397,
+        "epochs": 17,
+        "cap_limited_fits": 0
+      }
+    }
+  }
+}

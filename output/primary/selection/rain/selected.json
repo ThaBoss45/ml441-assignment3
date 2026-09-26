@@ -1,0 +1,55 @@
+{
+  "dataset": "rain",
+  "n": 1140,
+  "development_end": 912,
+  "validation_block": 114,
+  "history": 24,
+  "difference_lag": 0,
+  "test_start_date": "2007-01-01",
+  "folds": [
+    {
+      "number": 1,
+      "fit_end": 513,
+      "stop_end": 570,
+      "valid_end": 684
+    },
+    {
+      "number": 2,
+      "fit_end": 616,
+      "stop_end": 684,
+      "valid_end": 798
+    },
+    {
+      "number": 3,
+      "fit_end": 719,
+      "stop_end": 798,
+      "valid_end": 912
+    }
+  ],
+  "selected": {
+    "elman": {
+      "hidden": 18,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 29.427084456921552,
+      "parameter_count": 379,
+      "epochs": 12,
+      "cap_limited_fits": 0
+    },
+    "jordan": {
+      "hidden": 24,
+      "learning_rate": 0.003,
+      "mean_validation_mae": 29.695069550631345,
+      "parameter_count": 97,
+      "epochs": 8,
+      "cap_limited_fits": 0
+    },
+    "multi": {
+      "hidden": 18,
+      "learning_rate": 0.003,
+      "mean_validation_mae": 29.790388579489427,
+      "parameter_count": 397,
+      "epochs": 17,
+      "cap_limited_fits": 0
+    }
+  }
+}

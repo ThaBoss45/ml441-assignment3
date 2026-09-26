@@ -1,0 +1,55 @@
+{
+  "dataset": "power",
+  "n": 1440,
+  "development_end": 1152,
+  "validation_block": 144,
+  "history": 28,
+  "difference_lag": 0,
+  "test_start_date": "2010-02-11",
+  "folds": [
+    {
+      "number": 1,
+      "fit_end": 648,
+      "stop_end": 720,
+      "valid_end": 864
+    },
+    {
+      "number": 2,
+      "fit_end": 778,
+      "stop_end": 864,
+      "valid_end": 1008
+    },
+    {
+      "number": 3,
+      "fit_end": 908,
+      "stop_end": 1008,
+      "valid_end": 1152
+    }
+  ],
+  "selected": {
+    "elman": {
+      "hidden": 18,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 0.21155645523086763,
+      "parameter_count": 379,
+      "epochs": 17,
+      "cap_limited_fits": 0
+    },
+    "jordan": {
+      "hidden": 96,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 0.219081807296575,
+      "parameter_count": 385,
+      "epochs": 28,
+      "cap_limited_fits": 0
+    },
+    "multi": {
+      "hidden": 18,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 0.2122285399567472,
+      "parameter_count": 397,
+      "epochs": 15,
+      "cap_limited_fits": 0
+    }
+  }
+}

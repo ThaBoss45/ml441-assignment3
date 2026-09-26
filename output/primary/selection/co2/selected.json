@@ -1,0 +1,55 @@
+{
+  "dataset": "co2",
+  "n": 813,
+  "development_end": 650,
+  "validation_block": 81,
+  "history": 24,
+  "difference_lag": 1,
+  "test_start_date": "2012-06-01",
+  "folds": [
+    {
+      "number": 1,
+      "fit_end": 367,
+      "stop_end": 407,
+      "valid_end": 488
+    },
+    {
+      "number": 2,
+      "fit_end": 440,
+      "stop_end": 488,
+      "valid_end": 569
+    },
+    {
+      "number": 3,
+      "fit_end": 513,
+      "stop_end": 569,
+      "valid_end": 650
+    }
+  ],
+  "selected": {
+    "elman": {
+      "hidden": 18,
+      "learning_rate": 0.003,
+      "mean_validation_mae": 0.25628381162227837,
+      "parameter_count": 379,
+      "epochs": 286,
+      "cap_limited_fits": 0
+    },
+    "jordan": {
+      "hidden": 96,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 0.5746995030682859,
+      "parameter_count": 385,
+      "epochs": 69,
+      "cap_limited_fits": 0
+    },
+    "multi": {
+      "hidden": 18,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 0.2704814420675227,
+      "parameter_count": 397,
+      "epochs": 64,
+      "cap_limited_fits": 0
+    }
+  }
+}

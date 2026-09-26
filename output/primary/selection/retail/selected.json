@@ -1,0 +1,55 @@
+{
+  "dataset": "retail",
+  "n": 444,
+  "development_end": 355,
+  "validation_block": 44,
+  "history": 24,
+  "difference_lag": 12,
+  "test_start_date": "2018-08-01",
+  "folds": [
+    {
+      "number": 1,
+      "fit_end": 201,
+      "stop_end": 223,
+      "valid_end": 267
+    },
+    {
+      "number": 2,
+      "fit_end": 241,
+      "stop_end": 267,
+      "valid_end": 311
+    },
+    {
+      "number": 3,
+      "fit_end": 280,
+      "stop_end": 311,
+      "valid_end": 355
+    }
+  ],
+  "selected": {
+    "elman": {
+      "hidden": 8,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 1.3951780203315953,
+      "parameter_count": 89,
+      "epochs": 19,
+      "cap_limited_fits": 0
+    },
+    "jordan": {
+      "hidden": 96,
+      "learning_rate": 0.01,
+      "mean_validation_mae": 1.3826419135235781,
+      "parameter_count": 385,
+      "epochs": 12,
+      "cap_limited_fits": 0
+    },
+    "multi": {
+      "hidden": 18,
+      "learning_rate": 0.003,
+      "mean_validation_mae": 1.4268999547067318,
+      "parameter_count": 397,
+      "epochs": 14,
+      "cap_limited_fits": 0
+    }
+  }
+}
