@@ -179,6 +179,43 @@ def stationarity_sensitivity() -> dict:
             "results": results}
 
 
+def regime_difficulty() -> dict:
+    results = []
+    for dataset in DATASETS:
+        data = load_series(dataset)
+        levels = data.levels.to_numpy(dtype=float)
+        development_end, _, folds = boundaries(len(levels))
+        validation_indices = np.arange(folds[-1].stop_end, folds[-1].valid_end)
+        test_indices = np.arange(development_end, len(levels))
+        validation_indices = validation_indices[np.isfinite(levels[validation_indices])]
+        test_indices = test_indices[np.isfinite(levels[test_indices])]
+        filled = causal_fill(levels)
+
+        def describe(indices: np.ndarray) -> dict:
+            values = levels[indices]
+            persistence_errors = np.abs(values - filled[indices - 1])
+            return {"target_count": len(indices),
+                    "target_standard_deviation": float(np.std(values, ddof=1)),
+                    "persistence_mae": float(np.mean(persistence_errors))}
+
+        validation = describe(validation_indices)
+        test = describe(test_indices)
+        results.append({"dataset": dataset,
+                        "validation": validation,
+                        "test": test,
+                        "test_to_validation_standard_deviation_ratio":
+                            test["target_standard_deviation"] / validation["target_standard_deviation"],
+                        "test_to_validation_persistence_mae_ratio":
+                            test["persistence_mae"] / validation["persistence_mae"]})
+    return {"role": "supplementary post-hoc description of final-period forecasting difficulty",
+            "partition": "last development validation block and frozen final test",
+            "fixed": "target definitions, target positions and persistence rule",
+            "varied": "calendar period",
+            "model_selection_effect": "none",
+            "limitation": "The periods are contiguous historical segments, not independent replications; final-test targets were examined only after evaluation.",
+            "results": results}
+
+
 def main() -> None:
     if not (PRIMARY / "all_selected_before_test.json").exists():
         raise RuntimeError("Missing primary selection freeze")
@@ -188,6 +225,7 @@ def main() -> None:
     save("capacity_sensitivity.json", capacity_sensitivity(protocol))
     save("fit_sensitivity.json", fit_sensitivity())
     save("stationarity_sensitivity.json", stationarity_sensitivity())
+    save("regime_difficulty.json", regime_difficulty())
     print("Supplementary diagnostics generated from frozen records and development data")
 
 

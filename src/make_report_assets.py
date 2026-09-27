@@ -99,6 +99,7 @@ Paired errors, post-hoc & Frozen final predictions & Target and seed & None & De
 Budget sensitivity, post-hoc & Saved development folds & Budget and rate & None & Reuses selection folds \\
 Fit sensitivity, post-hoc & Saved development curves & Epoch & None & Different metrics \\
 Trend sensitivity, post-hoc & Development observations & Test specification & None & Test assumptions \\
+Regime difficulty, post-hoc & Final validation and test & Calendar period & None & Dependent periods \\
 \bottomrule
 \end{tabular}
 \end{table*}

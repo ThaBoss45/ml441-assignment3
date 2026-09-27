@@ -260,6 +260,7 @@ paired = json.loads((ROOT / "output/diagnostics/paired_errors.json").read_text()
 capacity = json.loads((ROOT / "output/diagnostics/capacity_sensitivity.json").read_text())
 fit = json.loads((ROOT / "output/diagnostics/fit_sensitivity.json").read_text())
 stationarity = json.loads((ROOT / "output/diagnostics/stationarity_sensitivity.json").read_text())
+regime = json.loads((ROOT / "output/diagnostics/regime_difficulty.json").read_text())
 paired_table = pd.DataFrame(paired["results"])
 capacity_table = pd.DataFrame([{
     "dataset": row["dataset"],
@@ -277,15 +278,19 @@ stationarity_table = pd.DataFrame([{
     "modelled_adf_trend_p": row["series"]["modelled_target"]["tests"]["ct"]["adf_unit_root_null_p"],
     "modelled_kpss_trend_p": row["series"]["modelled_target"]["tests"]["ct"]["kpss_stationarity_null_p"]}
     for row in stationarity["results"]])
+regime_table = pd.DataFrame(regime["results"])
 paired_table.to_csv(EXPORT / "paired_error_diagnostic.csv", index=False)
 capacity_table.to_csv(EXPORT / "capacity_diagnostic.csv", index=False)
 fit_table.to_csv(EXPORT / "fit_diagnostic.csv", index=False)
 stationarity_table.to_csv(EXPORT / "stationarity_sensitivity.csv", index=False)
+regime_table.to_csv(EXPORT / "regime_difficulty.csv", index=False)
 display(paired_table[["dataset", "winner", "runner", "relative_advantage_percent",
                       "paired_seed_wins"]])
 display(capacity_table)
 display(fit_table)
 display(stationarity_table)
+display(regime_table[["dataset", "test_to_validation_persistence_mae_ratio",
+                      "test_to_validation_standard_deviation_ratio"]])
 run_module("src.make_report_assets")
 """)
 
