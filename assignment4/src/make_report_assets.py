@@ -41,6 +41,20 @@ def fold_summary(frame, columns):
                      'minimum': float(folded[column].min()), 'maximum': float(folded[column].max())} for column in columns}
 
 
+def confusion_annotations(matrix):
+    labels = []
+    for row in range(len(matrix)):
+        off_diagonal = np.array(matrix[row], copy=True)
+        off_diagonal[row] = -1
+        largest = int(np.argmax(off_diagonal))
+        columns = [row] + ([largest] if off_diagonal[largest] > 0 else [])
+        for column in columns:
+            value = float(matrix[row, column])
+            text = '<1' if 0 < value < .005 else f'{100 * value:.0f}'
+            labels.append({'true': row, 'predicted': column, 'proportion': value, 'text': text})
+    return labels
+
+
 def table(path, caption, label, header, rows, columns=None, wide=False, prefix=''):
     environment = 'widetable' if wide else 'inlinetable'
     start = '\\widetablestart' if wide else '\\begin{inlinetable}'
@@ -131,6 +145,28 @@ def main():
             matched = [record['identity']['setting'] for record in cost['records'] if record['identity']['fold'] == row['outer_fold'] and record['identity']['model'] == model]
             require(matched == [row[key]], 'Historical controls differ from audited predictive reproduction')
     labels, names, seeds = protocol['data']['class_order'], protocol['data']['class_names'], protocol['ensemble']['seeds']
+    raw_path = ROOT / protocol['data']['file']
+    split_path = ROOT / protocol['splits']['source']
+    for path, expected in [(raw_path, protocol['data']['sha256']), (split_path, protocol['splits']['artifact_sha256'])]:
+        require(digest(path) == expected, 'Partition source differs: ' + str(path))
+        sources[str(path.relative_to(ROOT))] = expected
+    targets = pd.read_csv(raw_path, usecols=[protocol['data']['target']])[protocol['data']['target']].to_numpy()
+    require(len(targets) == protocol['data']['rows'], 'Partition target length differs')
+    partition_rows = []
+    roles = [('outer_train', 'Outer fitting'), ('outer_test', 'Outer test'), ('inner_train', 'Inner fitting'), ('inner_validation', 'Inner validation')]
+    with np.load(split_path, allow_pickle=False) as saved:
+        for index_seal in protocol['splits']['fold_index_hashes']:
+            fold = index_seal['fold']
+            for key, title in roles:
+                indices = saved[f'fold_{fold}_{key}']
+                require(hashlib.sha256(np.asarray(indices, dtype='<i8').tobytes()).hexdigest() == index_seal[key], 'Ordered partition indices differ')
+                partition_rows.append({'fold': fold, 'role': title, 'rows': len(indices),
+                                       'worms': int(np.count_nonzero(targets[indices] == names.index('Worms')))})
+    partitions = pd.DataFrame(partition_rows)
+    partition_ranges = [{'role': title, 'rows_min': int(partitions[partitions.role == title].rows.min()),
+                         'rows_max': int(partitions[partitions.role == title].rows.max()),
+                         'worms_min': int(partitions[partitions.role == title].worms.min()),
+                         'worms_max': int(partitions[partitions.role == title].worms.max())} for _, title in roles]
     structural = []
     count_rows = []
     count_runs = []
@@ -204,7 +240,12 @@ def main():
     confusion = {'neighbours': np.asarray(summary['baselines']['kNN']['pooled']['row_normalised_confusion']),
                  'tree': np.asarray(summary['baselines']['Classification tree']['pooled']['row_normalised_confusion']),
                  'ensemble': np.mean([v['row_normalised_confusion'] for v in summary['pooled_by_seed'].values()], axis=0)}
+    annotations = {model: confusion_annotations(matrix) for model, matrix in confusion.items()}
     analysis = {'status': 'audited_inputs_aggregated_no_new_selection', 'aggregate': aggregate, 'classes': class_rows,
+                'partitions': partition_rows, 'partition_ranges': partition_ranges, 'confusion_annotations': annotations,
+                'confusion_annotation_rule': {'cells': 'Diagonal and largest positive off-diagonal per true-class row; ties use first class in fixed order',
+                                              'units': 'Whole percentages; positive values below 0.5 percent displayed as <1',
+                                              'unlabelled': 'Colour retained; absence of text does not mean zero', 'font_points': 10},
                 'structural': factor.to_dict(orient='records'), 'tree_count': count_rows, 'pooled': pooled, 'costs': cost_summary,
                 'paired': summary['paired_comparisons'], 'selected': lock['selections'], 'historical_selected': historical,
                 'feature_paired_differences': paired_features.to_dict(orient='records'),
@@ -219,6 +260,9 @@ def main():
     for name, frame in [('structural_runs', structure), ('structural_means', factor), ('tree_count_runs', pd.DataFrame(count_runs)), ('tree_count_means', counts), ('outer_seed_fold', outer), ('class_assessment', classes), ('cost_runs', costs), ('feature_paired_contrasts', paired_features)]:
         frame.to_csv(archive / (name + '.csv'), index=False)
     (archive / 'analysis.json').write_text(json.dumps(analysis, indent=2, allow_nan=False) + '\n')
+    partitions.to_csv(archive / 'partition_counts.csv', index=False)
+    table(GENERATED / 'partitions.tex', 'Partition sizes across five folds', 'tab:partitions', ['Role', 'Rows', 'Worms'],
+          [[row['role'], f"{row['rows_min']}--{row['rows_max']}", f"{row['worms_min']}--{row['worms_max']}"] for row in partition_ranges])
     table(GENERATED / 'historical_neighbours.tex', 'Selected historical neighbour controls', 'tab:historical-neighbours', ['Fold', '$k$', 'Distance', 'Vote', '$q$'],
           [[row['outer_fold'], row['knn']['k'], 'Manhattan', 'Uniform' if row['knn']['weights'] == 'uniform' else 'Distance', '--' if row['knn']['weights'] == 'uniform' else f"{row['knn']['vote_exponent']:g}"] for row in historical])
     table(GENERATED / 'historical_tree.tex', 'Selected historical tree controls', 'tab:historical-tree', ['Fold', 'Criterion', 'Depth', 'Leaf', 'Weight', '$\\lambda$'],
@@ -277,6 +321,9 @@ def main():
     for model, matrix in confusion.items():
         fig, ax = plt.subplots(layout='constrained')
         picture = ax.imshow(matrix, vmin=0, vmax=1, cmap='Blues', aspect='equal')
+        for label in annotations[model]:
+            ax.text(label['predicted'], label['true'], label['text'], ha='center', va='center', fontsize=10,
+                    color='white' if label['proportion'] >= .55 else 'black')
         ax.set_xticks(range(10), names, rotation=65, ha='right', rotation_mode='anchor')
         ax.set_yticks(range(10), names)
         ax.set(xlabel='Predicted class', ylabel='True class')
@@ -309,7 +356,7 @@ def main():
                 'new_fits': 0, 'seed_selection': False, 'no_formal_test_or_independent_replicate_claim': True}
     (archive / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     (GENERATED / 'asset_manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
-    print(json.dumps({'status': 'generated_from_audited_evidence', 'directory': str(archive), 'tables': 11, 'figure_panels': 12, 'font': font}))
+    print(json.dumps({'status': 'generated_from_audited_evidence', 'directory': str(archive), 'tables': 12, 'figure_panels': 12, 'font': font}))
 
 
 if __name__ == '__main__':

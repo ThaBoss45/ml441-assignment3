@@ -1,4 +1,5 @@
 import importlib.util
+import copy
 import unittest
 from pathlib import Path
 
@@ -11,6 +12,44 @@ SPEC.loader.exec_module(AUDIT)
 
 
 class ReportAuditTests(unittest.TestCase):
+    def test_confusion_labels_reject_transposed_cells_and_incorrect_units(self):
+        matrix = np.eye(10)
+        matrix[0, 0], matrix[0, 3] = .424, .576
+        labels = [{'true': row, 'predicted': row, 'proportion': float(matrix[row, row]),
+                   'text': '42' if row == 0 else '100'} for row in range(10)]
+        labels.append({'true': 0, 'predicted': 3, 'proportion': .576, 'text': '58'})
+        AUDIT.verify_confusion_annotations(matrix, labels)
+        wrong = copy.deepcopy(labels)
+        wrong[-1]['true'], wrong[-1]['predicted'] = 3, 0
+        with self.assertRaisesRegex(ValueError, 'coverage'):
+            AUDIT.verify_confusion_annotations(matrix, wrong)
+        wrong = copy.deepcopy(labels)
+        wrong[-1]['text'] = '0.576'
+        with self.assertRaisesRegex(ValueError, 'percentage'):
+            AUDIT.verify_confusion_annotations(matrix, wrong)
+        wrong = copy.deepcopy(labels)
+        wrong[0]['proportion'] = .426
+        with self.assertRaisesRegex(ValueError, 'value'):
+            AUDIT.verify_confusion_annotations(matrix, wrong)
+
+    def test_confusion_labels_resolve_equal_errors_and_preserve_small_positive_values(self):
+        matrix = np.eye(10)
+        matrix[0, 0], matrix[0, 1], matrix[0, 2] = .992, .004, .004
+        labels = [{'true': row, 'predicted': row, 'proportion': float(matrix[row, row]),
+                   'text': str(round(float(100 * matrix[row, row])))} for row in range(10)]
+        labels.append({'true': 0, 'predicted': 1, 'proportion': .004, 'text': '<1'})
+        AUDIT.verify_confusion_annotations(matrix, labels)
+        for alteration in ['tied_class', 'rounded_to_zero', 'duplicate']:
+            wrong = copy.deepcopy(labels)
+            if alteration == 'tied_class':
+                wrong[-1]['predicted'] = 2
+            elif alteration == 'rounded_to_zero':
+                wrong[-1]['text'] = '0'
+            else:
+                wrong.append(copy.deepcopy(wrong[-1]))
+            with self.assertRaises(ValueError):
+                AUDIT.verify_confusion_annotations(matrix, wrong)
+
     def test_absent_classes_have_zero_scores_and_fixed_denominator(self):
         matrix = np.zeros((10, 10), dtype=int)
         matrix[0, 0] = 1

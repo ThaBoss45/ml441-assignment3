@@ -1,4 +1,5 @@
 import hashlib
+import csv
 import json
 import math
 from pathlib import Path
@@ -51,6 +52,24 @@ def table_row(path, values):
     require(' & '.join(str(value) for value in values) + '\\\\' in path.read_text(), 'Displayed row differs: ' + path.name)
 
 
+def verify_confusion_annotations(matrix, labels):
+    matrix = np.asarray(matrix, dtype=float)
+    require(matrix.shape == (10, 10) and np.all(np.isfinite(matrix)) and np.all((matrix >= 0) & (matrix <= 1)), 'Invalid normalised confusion')
+    expected_cells = {(row, row) for row in range(10)}
+    for row in range(10):
+        candidates = [(matrix[row, column], column) for column in range(10) if column != row and matrix[row, column] > 0]
+        if candidates:
+            value, column = min(candidates, key=lambda item: (-item[0], item[1]))
+            expected_cells.add((row, column))
+    cells = [(label['true'], label['predicted']) for label in labels]
+    require(len(cells) == len(set(cells)) and set(cells) == expected_cells, 'Confusion annotation coverage differs')
+    for label in labels:
+        value = matrix[label['true'], label['predicted']]
+        close(label['proportion'], value, 'Confusion annotation value differs')
+        expected_text = '<1' if 0 < value * 100 < .5 else str(round(float(value * 100)))
+        require(label['text'] == expected_text, 'Confusion annotation percentage differs')
+
+
 def main():
     manifest_path = ROOT / 'report/generated/asset_manifest.json'
     manifest = read(manifest_path)
@@ -67,6 +86,28 @@ def main():
     protocol = read(ROOT / 'configs/primary_protocol.json')
     tables = ROOT / 'report/generated'
     seeds = protocol['ensemble']['seeds']
+    with (ROOT / protocol['data']['file']).open(newline='') as stream:
+        targets = np.fromiter((int(row[protocol['data']['target']]) for row in csv.DictReader(stream)), dtype=np.int64)
+    require(len(targets) == protocol['data']['rows'], 'Partition target count differs')
+    partition_rows = []
+    roles = [('outer_train', 'Outer fitting'), ('outer_test', 'Outer test'), ('inner_train', 'Inner fitting'), ('inner_validation', 'Inner validation')]
+    with np.load(ROOT / protocol['splits']['source'], allow_pickle=False) as splits:
+        for fold in range(1, 6):
+            for key, title in roles:
+                indices = splits[f'fold_{fold}_{key}']
+                expected_hash = protocol['splits']['fold_index_hashes'][fold - 1][key]
+                require(hashlib.sha256(indices.astype('<i8').tobytes()).hexdigest() == expected_hash, 'Partition index seal differs')
+                partition_rows.append({'fold': fold, 'role': title, 'rows': int(indices.size),
+                                       'worms': int(sum(targets[indices] == protocol['data']['class_names'].index('Worms')))})
+    require(partition_rows == analysis['partitions'], 'Reported partition counts differ')
+    ranges = []
+    for _, title in roles:
+        rows = [row for row in partition_rows if row['role'] == title]
+        result = {'role': title, 'rows_min': min(row['rows'] for row in rows), 'rows_max': max(row['rows'] for row in rows),
+                  'worms_min': min(row['worms'] for row in rows), 'worms_max': max(row['worms'] for row in rows)}
+        ranges.append(result)
+        table_row(tables / 'partitions.tex', [title, f"{result['rows_min']}--{result['rows_max']}", f"{result['worms_min']}--{result['worms_max']}"])
+    require(ranges == analysis['partition_ranges'], 'Partition range summary differs')
     outer = summary['seed_fold_records']
     require(len(outer) == 15 and {(r['fold'], r['seed']) for r in outer} == {(f, s) for f in range(1, 6) for s in seeds}, 'Outer coverage differs')
     models = {'Ensemble': outer, 'Single tree': list(summary['baselines']['Classification tree']['folds'].values()), 'Neighbours': list(summary['baselines']['kNN']['folds'].values())}
@@ -95,6 +136,15 @@ def main():
         for field, value in metrics.items():
             close(matching[field], value, 'Reported pooled metric differs')
     support = pooled[str(seeds[0])]['support']
+    matrices = {}
+    for model, key in [('neighbours', 'kNN'), ('tree', 'Classification tree')]:
+        matrix = np.asarray(summary['baselines'][key]['pooled']['confusion'], dtype=float)
+        matrices[model] = matrix / matrix.sum(axis=1, keepdims=True)
+    seed_matrices = [np.sum([r['confusion'] for r in outer if r['seed'] == seed], axis=0) for seed in seeds]
+    matrices['ensemble'] = np.mean([matrix / matrix.sum(axis=1, keepdims=True) for matrix in seed_matrices], axis=0)
+    require(set(analysis['confusion_annotations']) == set(matrices), 'Confusion panel coverage differs')
+    for model, matrix in matrices.items():
+        verify_confusion_annotations(matrix, analysis['confusion_annotations'][model])
     require(int(support.sum()) == analysis['class_support_total'] == 257673, 'Support was multiplied or changed')
     require(int(support[7]) == 174, 'Scarce-class support differs')
     for position, row in enumerate(analysis['classes']):
@@ -181,10 +231,10 @@ def main():
     for row in analysis['pooled']:
         table_row(tables / 'pooled.tex', [row['pipeline']] + [f'{row[field]:.4f}' for field in ['macro_f1', 'balanced_accuracy', 'accuracy', 'normal_false_alarm_rate']])
     result = {'status': 'independent_report_numeric_audit_passed', 'asset_identity': manifest['asset_identity'], 'asset_manifest_sha256': sha(manifest_path),
-              'audit_source_sha256': sha(__file__), 'inputs_hashed': len(manifest['input_hashes']), 'tables_checked': 11,
+              'audit_source_sha256': sha(__file__), 'inputs_hashed': len(manifest['input_hashes']), 'tables_checked': 12,
               'outer_folds': 5, 'outer_seed_models': 15, 'structural_records': 180, 'cost_records': 25,
               'support': int(support.sum()), 'new_fits': 0, 'zero_division': 0,
-              'checks': ['Metrics independently derived from audited confusion counts', 'Five-fold summaries and sample deviations after seed averaging', 'Three-seed count sample deviations separately scoped', 'Historical selected controls matched to audited exact-prediction cost refits', 'Inactive uniform-voting exponents displayed as dashes', 'Separately pooled seed metrics', 'Paired fold differences and seed deviations', 'Class score mean never recomputed from mean precision/recall', 'Original support retained', 'All eleven formatted numeric tables matched', 'Prefix time remains null', 'Byte units and sampled-process peaks checked'],
+              'checks': ['Metrics independently derived from audited confusion counts', 'Sealed row positions and raw targets independently reproduce all partition and Worms counts', 'Selective confusion cells and whole-percentage labels independently derived from raw counts', 'Five-fold summaries and sample deviations after seed averaging', 'Three-seed count sample deviations separately scoped', 'Historical selected controls matched to audited exact-prediction cost refits', 'Inactive uniform-voting exponents displayed as dashes', 'Separately pooled seed metrics', 'Paired fold differences and seed deviations', 'Class score mean never recomputed from mean precision/recall', 'Original support retained', 'All twelve formatted numeric tables matched', 'Prefix time remains null', 'Byte units and sampled-process peaks checked'],
               'scope': 'Independent report arithmetic and source integrity; primary/cost audits remain the provenance authorities; visual/language review and human proofread are separate'}
     output = ROOT / 'output/verification/report_assets_audit.json'
     output.write_text(json.dumps(result, indent=2) + '\n')
