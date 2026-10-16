@@ -1,0 +1,14 @@
+*
+!.gitignore
+!pyproject.toml
+!requirements.txt
+!requirements-notebook.txt
+!src/
+!src/ml441_assignment4/
+!src/ml441_assignment4/*.py
+!tests/
+!tests/*.py
+!notebooks/
+!notebooks/experiment_log.ipynb
+!src/*.py
+!requirements-report.txt

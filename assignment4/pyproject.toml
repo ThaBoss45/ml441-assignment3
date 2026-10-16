@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ml441-assignment4"
+version = "0.1.0"
+requires-python = ">=3.13,<3.14"
+dynamic = ["dependencies"]
+
+[project.scripts]
+ml441-a4 = "ml441_assignment4.experiment:main"
+ml441-a4-inputs = "publication_inputs:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+py-modules = ["publication_inputs"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["src"]
