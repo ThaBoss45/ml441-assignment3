@@ -41,6 +41,18 @@ def fold_summary(frame, columns):
                      'minimum': float(folded[column].min()), 'maximum': float(folded[column].max())} for column in columns}
 
 
+def screening_metrics(confusion):
+    matrix = np.asarray(confusion, dtype=np.int64)
+    normal = int(matrix[0].sum())
+    attacks = int(matrix[1:].sum())
+    false_alarms = int(matrix[0, 1:].sum())
+    misses = int(matrix[1:, 0].sum())
+    require(normal > 0 and attacks > 0, 'Screening populations must both be represented')
+    return {'normal_support': normal, 'attack_support': attacks, 'false_alarm_count': false_alarms,
+            'missed_attack_count': misses, 'normal_false_alarm_rate': false_alarms / normal,
+            'attack_miss_rate': misses / attacks}
+
+
 def confusion_annotations(matrix):
     labels = []
     for row in range(len(matrix)):
@@ -200,11 +212,11 @@ def main():
                                'checkpoint_mib': float(np.mean([r['checkpoint_mib'] for r in runs])),
                                'fit_seconds': None if trees == 50 else float(np.mean([r['fit_seconds'] for r in runs]))})
     counts = pd.DataFrame(count_rows)
-    outer = pd.DataFrame(summary['seed_fold_records'])
-    aggregate = {'Ensemble': fold_summary(outer, ['macro_f1', 'balanced_accuracy', 'accuracy', 'normal_false_alarm_rate'])}
+    outer = pd.DataFrame([{**record, 'attack_miss_rate': screening_metrics(record['confusion'])['attack_miss_rate']} for record in summary['seed_fold_records']])
+    aggregate = {'Ensemble': fold_summary(outer, ['macro_f1', 'balanced_accuracy', 'accuracy', 'normal_false_alarm_rate', 'attack_miss_rate'])}
     for key, title in [('kNN', 'Neighbours'), ('Classification tree', 'Single tree')]:
-        values = pd.DataFrame([{'fold': int(fold), **record} for fold, record in summary['baselines'][key]['folds'].items()])
-        aggregate[title] = fold_summary(values, ['macro_f1', 'balanced_accuracy', 'accuracy', 'normal_false_alarm_rate'])
+        values = pd.DataFrame([{'fold': int(fold), **record, 'attack_miss_rate': screening_metrics(record['confusion'])['attack_miss_rate']} for fold, record in summary['baselines'][key]['folds'].items()])
+        aggregate[title] = fold_summary(values, ['macro_f1', 'balanced_accuracy', 'accuracy', 'normal_false_alarm_rate', 'attack_miss_rate'])
     class_rows = []
     for c in labels:
         row = {'class': names[c], 'label': c, 'support': summary['pooled_by_seed'][str(seeds[0])]['support'][c]}
@@ -237,6 +249,24 @@ def main():
     paired_features = pd.DataFrame(pairs)
     pooled = [{'pipeline': 'Neighbours', **summary['baselines']['kNN']['pooled']}, {'pipeline': 'Single tree', **summary['baselines']['Classification tree']['pooled']}]
     pooled += [{'pipeline': 'Ensemble ' + str(seed), **summary['pooled_by_seed'][str(seed)]} for seed in seeds]
+    for row in pooled:
+        row.update(screening_metrics(row['confusion']))
+    screening_reference = source(ROOT / 'output/supplementary/R02_screening_review/screening_diagnostic.json')
+    for path, expected in screening_reference['source_hashes'].items():
+        require(audit['verified_files_sha256'][path] == expected and digest(ROOT / path) == expected, 'Screening prediction source differs')
+        sources[path] = expected
+    for row in pooled:
+        model = 'kNN' if row['pipeline'] == 'Neighbours' else 'Classification tree' if row['pipeline'] == 'Single tree' else 'Ensemble'
+        seed = None if model != 'Ensemble' else int(row['pipeline'].split()[-1])
+        reference = next(v for v in screening_reference['rows'] if v['model'] == model and v['seed'] == seed)
+        require(row['false_alarm_count'] == reference['false_alarm'] and row['missed_attack_count'] == reference['missed_attack'], 'Screening projection differs')
+    ensemble_screening = {field: float(np.mean([row[field] for row in pooled if row['pipeline'].startswith('Ensemble ')])) for field in ['false_alarm_count', 'missed_attack_count', 'normal_false_alarm_rate', 'attack_miss_rate']}
+    screening_costs = []
+    for row in pooled[:2]:
+        ratio = (row['false_alarm_count'] - ensemble_screening['false_alarm_count']) / (ensemble_screening['missed_attack_count'] - row['missed_attack_count'])
+        screening_costs.append({'baseline': row['pipeline'], 'break_even_ratio': ratio,
+                                'direction': 'Ensemble lower screening cost below this ratio; baseline lower above',
+                                'scope': 'Hypothetical post-hoc two-error loss using mean seed counts; no deployment costs assumed'})
     confusion = {'neighbours': np.asarray(summary['baselines']['kNN']['pooled']['row_normalised_confusion']),
                  'tree': np.asarray(summary['baselines']['Classification tree']['pooled']['row_normalised_confusion']),
                  'ensemble': np.mean([v['row_normalised_confusion'] for v in summary['pooled_by_seed'].values()], axis=0)}
@@ -247,6 +277,8 @@ def main():
                                               'units': 'Whole percentages; positive values below 0.5 percent displayed as <1',
                                               'unlabelled': 'Colour retained; absence of text does not mean zero', 'font_points': 10},
                 'structural': factor.to_dict(orient='records'), 'tree_count': count_rows, 'pooled': pooled, 'costs': cost_summary,
+                'screening_seed_mean': ensemble_screening, 'screening_costs': screening_costs,
+                'screening_role': 'Post-hoc Normal-versus-any-attack reporting projection, with no selection effect; wrong attack-category labels count as screening detections',
                 'paired': summary['paired_comparisons'], 'selected': lock['selections'], 'historical_selected': historical,
                 'feature_paired_differences': paired_features.to_dict(orient='records'),
                 'count_mean_across_folds': counts.groupby('trees')['mean'].mean().to_dict(),
@@ -260,6 +292,9 @@ def main():
     for name, frame in [('structural_runs', structure), ('structural_means', factor), ('tree_count_runs', pd.DataFrame(count_runs)), ('tree_count_means', counts), ('outer_seed_fold', outer), ('class_assessment', classes), ('cost_runs', costs), ('feature_paired_contrasts', paired_features)]:
         frame.to_csv(archive / (name + '.csv'), index=False)
     (archive / 'analysis.json').write_text(json.dumps(analysis, indent=2, allow_nan=False) + '\n')
+    prose_macros = [('screeningRatioNeighbours', screening_costs[0]['break_even_ratio']),
+                   ('screeningRatioTree', screening_costs[1]['break_even_ratio'])]
+    (GENERATED / 'screening_values.tex').write_text(''.join('\\newcommand{\\' + name + '}{' + f'{value:.2f}' + '}\n' for name, value in prose_macros))
     partitions.to_csv(archive / 'partition_counts.csv', index=False)
     table(GENERATED / 'partitions.tex', 'Partition sizes across five folds', 'tab:partitions', ['Role', 'Rows', 'Worms'],
           [[row['role'], f"{row['rows_min']}--{row['rows_max']}", f"{row['worms_min']}--{row['worms_max']}"] for row in partition_ranges])
@@ -273,12 +308,20 @@ def main():
           [[int(a.leaf), 'All' if a.features == 'all' else '13', a.weight, f'{a.macro_f1:.4f}', f'{a.macro_f1_fold_sd:.4f}', f'{a.balanced_accuracy:.4f}'] for a in factor.itertuples()])
     table(GENERATED / 'counts.tex', 'Conditional validation scores', 'tab:counts', ['Fold', '50 trees', '100 trees', '200 trees'],
           [[fold] + [f"{counts[(counts.fold == fold) & (counts.trees == n)]['mean'].iloc[0]:.4f} $\\pm$ {counts[(counts.fold == fold) & (counts.trees == n)]['seed_sd'].iloc[0]:.4f}" for n in [50, 100, 200]] for fold in range(1, 6)])
-    table(GENERATED / 'aggregate.tex', 'Matched outer assessment', 'tab:aggregate', ['Pipeline', '$f_{\\mathrm{m}}$', 'Deviation', '$\\beta$', 'False alarms'],
-          [[title, f"{aggregate[title]['macro_f1']['mean']:.4f}", f"{aggregate[title]['macro_f1']['fold_sd']:.4f}", f"{aggregate[title]['balanced_accuracy']['mean']:.4f}", f"{aggregate[title]['normal_false_alarm_rate']['mean']:.4f}"] for title in ['Neighbours', 'Single tree', 'Ensemble']])
+    assessment_rows = [[title, f"{aggregate[title]['macro_f1']['mean']:.4f}", f"{aggregate[title]['macro_f1']['fold_sd']:.4f}"] +
+                       [f"{aggregate[title][field]['mean']:.4f}" for field in ['balanced_accuracy', 'accuracy', 'normal_false_alarm_rate', 'attack_miss_rate']]
+                       for title in ['Neighbours', 'Single tree', 'Ensemble']]
+    assessment_rows += [[row['pipeline'], f"{row['macro_f1']:.4f}", '--'] + [f"{row[field]:.4f}" for field in ['balanced_accuracy', 'accuracy', 'normal_false_alarm_rate', 'attack_miss_rate']] for row in pooled]
+    table(GENERATED / 'assessment.tex', 'Matched fold and pooled assessment', 'tab:assessment',
+          ['Pipeline', '$f_{\\mathrm{m}}$', 'Deviation', '$\\beta$', 'Accuracy', 'False alarms', 'Attack misses'], assessment_rows, wide=True)
+    content = (GENERATED / 'assessment.tex').read_text().replace('\\midrule\n', '\\midrule\n\\multicolumn{7}{l}{Five-fold means after seed averaging}\\\\\n', 1)
+    marker = 'Neighbours & ' + f"{pooled[0]['macro_f1']:.4f}" + ' & --'
+    content = content.replace(marker, '\\midrule\n\\multicolumn{7}{l}{Separately pooled predictions}\\\\\n' + marker, 1)
+    (GENERATED / 'assessment.tex').write_text(content)
+    for obsolete in ['aggregate.tex', 'pooled.tex']:
+        (GENERATED / obsolete).unlink(missing_ok=True)
     table(GENERATED / 'paired.tex', 'Paired outer score differences', 'tab:paired', ['Fold', 'Minus neighbours', 'Minus tree', 'Seed deviation'],
           [[fold, f"+{summary['paired_comparisons']['kNN'][fold - 1]['difference']:.4f}", f"+{summary['paired_comparisons']['Classification tree'][fold - 1]['difference']:.4f}", f"{summary['folds'][fold - 1]['macro_f1_seed_sd']:.4f}"] for fold in range(1, 6)])
-    table(GENERATED / 'pooled.tex', 'Separately pooled assessment', 'tab:pooled', ['Pipeline', '$f_{\\mathrm{m}}$', '$\\beta$', 'Accuracy', 'False alarms'],
-          [[p['pipeline']] + [f'{p[name]:.4f}' for name in ['macro_f1', 'balanced_accuracy', 'accuracy', 'normal_false_alarm_rate']] for p in pooled])
     class_header = ['Class', 'Support'] + ['$\\pi_c$', '$r_c$', '$f_{1,c}$'] * 3
     class_table_rows = [[r['class'], str(r['support'])] + [f"{r[model + '_' + metric]:.4f}" for model in ['neighbours', 'tree', 'ensemble'] for metric in ['precision', 'recall', 'f1']] for r in class_rows]
     group = '\\multicolumn{2}{c}{} & \\multicolumn{3}{c}{Nearest neighbours} & \\multicolumn{3}{c}{Single tree} & \\multicolumn{3}{c}{Tree ensemble}\\\\\n\\cmidrule(lr){3-5}\\cmidrule(lr){6-8}\\cmidrule(lr){9-11}\n'
@@ -349,14 +392,23 @@ def main():
         if path.suffix in ['.png', '.tex']:
             shutil.copy2(path, archive / path.name)
     shutil.copy2(__file__, archive / 'make_report_assets.py')
+    supplementary = ROOT / 'output/supplementary/R03_report_visuals' / identity
+    supplementary.mkdir(parents=True, exist_ok=True)
+    supplementary_panels = [f'count_{fold}.png' for fold in range(1, 6)] + ['paired_neighbours.png', 'paired_tree.png']
+    for name in supplementary_panels:
+        shutil.copy2(GENERATED / name, supplementary / name)
     manifest = {'asset_identity': identity, 'script_sha256': digest(__file__), 'input_hashes': sources, 'font': font,
                 'font_source': {'type1_path': str(type1_path), 'type1_sha256': digest(type1_path), 'converted_sha256': digest(font_path), 'purpose': 'Original report-body Type 1 outlines converted to an OpenType container for matching plot text; no plot font substitution'},
                 'software': {'matplotlib': matplotlib.__version__, 'numpy': np.__version__, 'pandas': pd.__version__},
                 'files': {path.name: digest(path) for path in sorted(archive.iterdir()) if path.is_file()},
+                'main_report_panels': ['diversity_none.png', 'diversity_balanced.png', 'confusion_neighbours.png', 'confusion_tree.png', 'confusion_ensemble.png'],
+                'numeric_prose_macros': 'screening_values.tex',
+                'supplementary_visuals': {'directory': str(supplementary.relative_to(ROOT)), 'files': supplementary_panels,
+                                          'role': 'Seed-range plots retained outside the condensed report; main tables retain means and sample deviations'},
                 'new_fits': 0, 'seed_selection': False, 'no_formal_test_or_independent_replicate_claim': True}
     (archive / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     (GENERATED / 'asset_manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
-    print(json.dumps({'status': 'generated_from_audited_evidence', 'directory': str(archive), 'tables': 12, 'figure_panels': 12, 'font': font}))
+    print(json.dumps({'status': 'generated_from_audited_evidence', 'directory': str(archive), 'tables': 11, 'main_report_panels': 5, 'supplementary_panels': 7, 'font': font}))
 
 
 if __name__ == '__main__':

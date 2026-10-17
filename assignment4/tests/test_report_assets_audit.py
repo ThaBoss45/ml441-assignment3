@@ -12,6 +12,34 @@ SPEC.loader.exec_module(AUDIT)
 
 
 class ReportAuditTests(unittest.TestCase):
+    def test_screening_projection_uses_attack_population_and_retains_type_errors(self):
+        matrix = np.zeros((10, 10), dtype=int)
+        matrix[0, 0], matrix[0, 1] = 80, 20
+        matrix[1, 0], matrix[1, 1], matrix[1, 2], matrix[2, 2] = 5, 10, 15, 20
+        report = AUDIT.screening_counts(matrix)
+        self.assertEqual(report['normal_support'], 100)
+        self.assertEqual(report['attack_support'], 50)
+        self.assertEqual(report['false_alarm_count'], 20)
+        self.assertEqual(report['missed_attack_count'], 5)
+        self.assertEqual(report['normal_false_alarm_rate'], .2)
+        self.assertEqual(report['attack_miss_rate'], .1)
+        self.assertNotAlmostEqual(report['attack_miss_rate'], 1 - AUDIT.assess(matrix)['precision'][0])
+        self.assertEqual(int(matrix[1:, 1:].sum()), 45)
+        self.assertEqual(int(matrix.trace()) - matrix[0, 0], 30)
+        with self.assertRaisesRegex(ValueError, 'both be represented'):
+            AUDIT.screening_counts(np.diag([1] + [0] * 9))
+
+    def test_hypothetical_cost_threshold_has_correct_orientation(self):
+        ensemble = {'false_alarm_count': 10, 'missed_attack_count': 6}
+        baseline = {'false_alarm_count': 30, 'missed_attack_count': 2}
+        ratio = AUDIT.screening_break_even(ensemble, baseline)
+        self.assertEqual(ratio, 5)
+        self.assertLess(10 + 4 * 6, 30 + 4 * 2)
+        self.assertEqual(10 + ratio * 6, 30 + ratio * 2)
+        self.assertGreater(10 + 6 * 6, 30 + 6 * 2)
+        with self.assertRaisesRegex(ValueError, 'trade-off absent'):
+            AUDIT.screening_break_even({'false_alarm_count': 5, 'missed_attack_count': 1}, baseline)
+
     def test_confusion_labels_reject_transposed_cells_and_incorrect_units(self):
         matrix = np.eye(10)
         matrix[0, 0], matrix[0, 3] = .424, .576

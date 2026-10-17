@@ -52,6 +52,7 @@ def inspect_inputs(project_root, phase="primary"):
     if phase == "report":
         required["report/generated/asset_manifest.json"] = "Existing report assets for independent report checking"
         required["output/verification/gate1_provenance_audit.json"] = "Historical source and control provenance"
+        required["output/supplementary/R02_screening_review/screening_diagnostic.json"] = "Post-hoc screening projection and sealed prediction-source identities"
     inputs = [{"path": name, "purpose": purpose, "exists": local_path(root, name).is_file()}
               for name, purpose in sorted(required.items())]
     missing = [item["path"] for item in inputs if not item["exists"]]

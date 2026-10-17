@@ -1,5 +1,6 @@
 import hashlib
 import csv
+import gzip
 import json
 import math
 from pathlib import Path
@@ -39,6 +40,26 @@ def assess(confusion):
     return {'precision': precision, 'recall': recall, 'f1': f1, 'support': support,
             'macro_f1': f1.mean(), 'balanced_accuracy': recall.mean(),
             'accuracy': correct.sum() / matrix.sum(), 'normal_false_alarm_rate': 1 - recall[0]}
+
+
+def screening_counts(confusion):
+    matrix = np.asarray(confusion, dtype=np.int64)
+    require(matrix.shape == (10, 10) and np.all(matrix >= 0), 'Invalid screening confusion')
+    normal = int(sum(matrix[0]))
+    attacks = int(matrix.sum()) - normal
+    require(normal > 0 and attacks > 0, 'Screening populations must both be represented')
+    false_alarms = normal - int(matrix[0, 0])
+    misses = int(sum(matrix[:, 0])) - int(matrix[0, 0])
+    return {'normal_support': normal, 'attack_support': attacks, 'false_alarm_count': false_alarms,
+            'missed_attack_count': misses, 'normal_false_alarm_rate': false_alarms / normal,
+            'attack_miss_rate': misses / attacks}
+
+
+def screening_break_even(ensemble, baseline):
+    saved_alarms = baseline['false_alarm_count'] - ensemble['false_alarm_count']
+    extra_misses = ensemble['missed_attack_count'] - baseline['missed_attack_count']
+    require(saved_alarms > 0 and extra_misses > 0, 'Expected screening trade-off absent')
+    return saved_alarms / extra_misses
 
 
 def nested(values):
@@ -116,15 +137,16 @@ def main():
         for original, calculated in zip(records, checked):
             for field in calculated:
                 close(original[field], calculated[field], 'Source metric differs: ' + field)
-        for field in ['macro_f1', 'balanced_accuracy', 'accuracy', 'normal_false_alarm_rate']:
+        for field in ['macro_f1', 'balanced_accuracy', 'accuracy', 'normal_false_alarm_rate', 'attack_miss_rate']:
             values = {fold: [] for fold in range(1, 6)}
             for pos, calculated in enumerate(checked):
                 fold = records[pos]['fold'] if model == 'Ensemble' else pos + 1
-                values[fold].append(calculated[field])
+                values[fold].append(screening_counts(records[pos]['confusion'])[field] if field == 'attack_miss_rate' else calculated[field])
             for name, value in nested(values).items():
                 close(analysis['aggregate'][model][field][name], value, 'Nested fold summary differs')
         a = analysis['aggregate'][model]
-        table_row(tables / 'aggregate.tex', [model, f"{a['macro_f1']['mean']:.4f}", f"{a['macro_f1']['fold_sd']:.4f}", f"{a['balanced_accuracy']['mean']:.4f}", f"{a['normal_false_alarm_rate']['mean']:.4f}"])
+        table_row(tables / 'assessment.tex', [model, f"{a['macro_f1']['mean']:.4f}", f"{a['macro_f1']['fold_sd']:.4f}"] +
+                  [f"{a[field]['mean']:.4f}" for field in ['balanced_accuracy', 'accuracy', 'normal_false_alarm_rate', 'attack_miss_rate']])
     pooled = {}
     for seed in seeds:
         records = [r for r in outer if r['seed'] == seed]
@@ -228,13 +250,59 @@ def main():
         penalty_exponent = round(math.log10(tree['ccp_alpha']))
         close(tree['ccp_alpha'], 10. ** penalty_exponent, 'Displayed pruning penalty differs')
         table_row(tables / 'historical_tree.tex', [row['outer_fold'], tree['criterion'].capitalize(), tree['max_depth'], tree['min_samples_leaf'], 'None' if tree['class_weight'] is None else 'Balanced', '$10^{' + str(penalty_exponent) + '}$'])
+    prediction_counts = {}
+    for seed in seeds:
+        matrices, positions = [], []
+        for fold in range(1, 6):
+            path = ROOT / f'output/primary/82b87926ac5a04b6/evaluation/fold_{fold}/seed_{seed}/predictions.npz'
+            require(str(path.relative_to(ROOT)) in manifest['input_hashes'], 'Prediction input not sealed')
+            with np.load(path, allow_pickle=False) as saved:
+                matrices.append(np.bincount(saved['true'] * 10 + saved['predicted'], minlength=100).reshape(10, 10))
+                positions.append(saved['row_index'])
+        require(np.array_equal(np.sort(np.concatenate(positions)), np.arange(257673)), 'Screening row coverage differs')
+        matrix = np.sum(matrices, axis=0)
+        close(matrix, summary['pooled_by_seed'][str(seed)]['confusion'], 'Saved prediction counts differ')
+        prediction_counts['Ensemble ' + str(seed)] = screening_counts(matrix)
+    baseline_matrices = {model: np.zeros((10, 10), dtype=np.int64) for model in ['kNN', 'Classification tree']}
+    baseline_positions = {model: set() for model in baseline_matrices}
+    with gzip.open(ROOT / 'materials/assignment2_baseline_records/outer_predictions.csv.gz', 'rt', newline='') as stream:
+        for row in csv.DictReader(stream):
+            model, index = row['model'], int(row['row_index'])
+            require(index not in baseline_positions[model], 'Repeated baseline screening row')
+            baseline_positions[model].add(index)
+            baseline_matrices[model][int(row['true']), int(row['predicted'])] += 1
+    for model, title in [('kNN', 'Neighbours'), ('Classification tree', 'Single tree')]:
+        require(baseline_positions[model] == set(range(257673)), 'Baseline screening coverage differs')
+        close(baseline_matrices[model], summary['baselines'][model]['pooled']['confusion'], 'Baseline prediction counts differ')
+        prediction_counts[title] = screening_counts(baseline_matrices[model])
     for row in analysis['pooled']:
-        table_row(tables / 'pooled.tex', [row['pipeline']] + [f'{row[field]:.4f}' for field in ['macro_f1', 'balanced_accuracy', 'accuracy', 'normal_false_alarm_rate']])
+        calculated = prediction_counts[row['pipeline']]
+        for field, value in calculated.items():
+            close(row[field], value, 'Screening count or population differs')
+        table_row(tables / 'assessment.tex', [row['pipeline'], f"{row['macro_f1']:.4f}", '--'] +
+                  [f'{row[field]:.4f}' for field in ['balanced_accuracy', 'accuracy', 'normal_false_alarm_rate', 'attack_miss_rate']])
+    ensemble_screening = {field: float(np.mean([prediction_counts['Ensemble ' + str(seed)][field] for seed in seeds]))
+                          for field in ['false_alarm_count', 'missed_attack_count', 'normal_false_alarm_rate', 'attack_miss_rate']}
+    require(ensemble_screening == analysis['screening_seed_mean'], 'Mean seed screening values differ')
+    for report in analysis['screening_costs']:
+        ratio = screening_break_even(ensemble_screening, prediction_counts[report['baseline']])
+        close(report['break_even_ratio'], ratio, 'Hypothetical screening break-even differs')
+        macro = 'screeningRatioNeighbours' if report['baseline'] == 'Neighbours' else 'screeningRatioTree'
+        require('\\newcommand{\\' + macro + '}{' + f'{ratio:.2f}' + '}' in (tables / manifest['numeric_prose_macros']).read_text(), 'Displayed cost ratio differs')
+        for factor in [.9, 1.1]:
+            cost_ratio = ratio * factor
+            ensemble_cost = ensemble_screening['false_alarm_count'] + cost_ratio * ensemble_screening['missed_attack_count']
+            baseline = prediction_counts[report['baseline']]
+            baseline_cost = baseline['false_alarm_count'] + cost_ratio * baseline['missed_attack_count']
+            require((ensemble_cost < baseline_cost) == (factor < 1), 'Cost direction differs')
+    for name in manifest['supplementary_visuals']['files']:
+        require(sha(ROOT / manifest['supplementary_visuals']['directory'] / name) == manifest['files'][name], 'Supplementary plot differs')
     result = {'status': 'independent_report_numeric_audit_passed', 'asset_identity': manifest['asset_identity'], 'asset_manifest_sha256': sha(manifest_path),
-              'audit_source_sha256': sha(__file__), 'inputs_hashed': len(manifest['input_hashes']), 'tables_checked': 12,
+              'audit_source_sha256': sha(__file__), 'inputs_hashed': len(manifest['input_hashes']), 'tables_checked': 11,
               'outer_folds': 5, 'outer_seed_models': 15, 'structural_records': 180, 'cost_records': 25,
               'support': int(support.sum()), 'new_fits': 0, 'zero_division': 0,
-              'checks': ['Metrics independently derived from audited confusion counts', 'Sealed row positions and raw targets independently reproduce all partition and Worms counts', 'Selective confusion cells and whole-percentage labels independently derived from raw counts', 'Five-fold summaries and sample deviations after seed averaging', 'Three-seed count sample deviations separately scoped', 'Historical selected controls matched to audited exact-prediction cost refits', 'Inactive uniform-voting exponents displayed as dashes', 'Separately pooled seed metrics', 'Paired fold differences and seed deviations', 'Class score mean never recomputed from mean precision/recall', 'Original support retained', 'All twelve formatted numeric tables matched', 'Prefix time remains null', 'Byte units and sampled-process peaks checked'],
+              'screening_prediction_sources_checked': 16, 'screening_role': 'Post-hoc descriptive projection, not primary selection',
+              'checks': ['Metrics independently derived from audited confusion counts', 'Sealed row positions and raw targets independently reproduce all partition and Worms counts', 'Selective confusion cells and whole-percentage labels independently derived from raw counts', 'Five-fold summaries and sample deviations after seed averaging', 'Three-seed count sample deviations separately scoped', 'Historical selected controls matched to audited exact-prediction cost refits', 'Inactive uniform-voting exponents displayed as dashes', 'Separately pooled seed metrics and screening rates', 'Binary screening counts independently reconstructed from every saved prediction', 'Hypothetical break-even ratios and cost direction checked', 'Paired fold differences and seed deviations', 'Class score mean never recomputed from mean precision/recall', 'Original support retained', 'All eleven formatted numeric tables matched', 'Prefix time remains null', 'Byte units and sampled-process peaks checked', 'Seven supplementary seed-range panels preserved'],
               'scope': 'Independent report arithmetic and source integrity; primary/cost audits remain the provenance authorities; visual/language review and human proofread are separate'}
     output = ROOT / 'output/verification/report_assets_audit.json'
     output.write_text(json.dumps(result, indent=2) + '\n')
